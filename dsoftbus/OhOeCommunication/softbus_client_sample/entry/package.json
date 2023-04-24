@@ -1,0 +1,16 @@
+{
+	"license": "ISC",
+	"devDependencies": {
+		"@types/libsoftbus_clent_run.so": "file:./src/main/cpp/types/libsoftbus_client_run"
+	},
+	"name": "entry",
+	"ohos": {
+		"org": "huawei",
+		"directoryLevel": "module",
+		"buildTool": "hvigor"
+	},
+	"description": "example description",
+	"repository": {},
+	"version": "1.0.0",
+	"dependencies": {}
+}
