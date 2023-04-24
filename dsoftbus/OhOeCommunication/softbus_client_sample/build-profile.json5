@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "certpath": "C:\\Users\\LhwHyz\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.softbusclient.cer",
+          "storePassword": "0000001B9A72E29C34A8B5DA3E608D26B947398D837525313045DCD026188A2A2B6F80E612D4223C582AD3",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BAD6B00625708B6EF9A69F50BFE6216581287E3523DFC99DFEA305FB7212A5F16537553B8E585D8",
+          "profile": "C:\\Users\\LhwHyz\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.softbusclient.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\LhwHyz\\.ohos\\config\\openharmony\\auto_ohos_default_com.example.softbusclient.p12"
+        }
+      }
+    ],
+    "compileSdkVersion": 9,
+    "compatibleSdkVersion": 9,
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+      },
+      {
+        "name": "softbusclient",
+        "signingConfig": "default"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

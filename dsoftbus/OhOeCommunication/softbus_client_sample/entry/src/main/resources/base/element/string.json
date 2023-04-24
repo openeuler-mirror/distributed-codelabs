@@ -1,0 +1,56 @@
+{
+  "string": [
+    {
+      "name": "entry_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility_label",
+      "value": "drone"
+    },
+    {
+      "name": "MainAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "AI_analysis",
+      "value": "AI分析结果"
+    },
+    {
+      "name": "Situation_perception_realtime",
+      "value": "防火事态感知（实时)"
+    },
+    {
+      "name": "Situation_perception_show",
+      "value": "防火事态感知（演示)"
+    },
+    {
+      "name": "Unlock",
+      "value": "发送数据"
+    },
+    {
+      "name": "take_off",
+      "value": "TAKE OFF"
+    },
+    {
+      "name": "landing",
+      "value": "LANDING"
+    },
+    {
+      "name": "connection_succeed",
+      "value": "连接成功"
+    },
+    {
+      "name": "terminal",
+      "value": "终端："
+    },
+    {
+      "name": "hasNewImage",
+      "value": "新的AI分析图片"
+    },
+    {
+      "name": "hasNewSAImage",
+      "value": "新的态势图片"
+    }
+  ]
+}

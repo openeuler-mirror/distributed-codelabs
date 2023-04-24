@@ -1,0 +1,32 @@
+{
+  "color": [
+    {
+      "name": "red",
+      "value": "#6495ED"
+    },
+    {
+      "name": "white",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "black",
+      "value": "#000000"
+    },
+    {
+      "name": "bg_color",
+      "value": "#F1F3F5"
+    },
+    {
+      "name": "transparent",
+      "value": "#00000000"
+    },
+    {
+      "name": "transparent_grey",
+      "value": "#3Ce6e6e6"
+    },
+    {
+      "name": "button_color",
+      "value": "#3E78FF"
+    }
+  ]
+}
