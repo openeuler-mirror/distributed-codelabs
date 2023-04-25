@@ -1,0 +1,4 @@
+{
+  "name": "libsoftbus_client_run.so",
+  "types": "./index.d.ts"
+}
