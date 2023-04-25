@@ -1,23 +1,24 @@
 # distributed-codelabs
 
 #### 介绍
-Distributed middleware code laboratory, mainly storing some application examples
+该仓库为openEuler分布式能力的应用示例，旨在让开发者能够快速了解openEuler所具备的分布式能力以及相关的应用开发流程。非常欢迎大家参与到分布式能力应用开发中来，使能更多的应用场景。
 
-#### 软件架构
-软件架构说明
+#### 目录结构
+请大家提交代码时按照如下结构，若不满足实际开发需求，请在提交时说明。
 
+![image-20230425164123098](images/code-struct.png)
 
-#### 安装教程
+#### 目录
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- 分布式软总线应用
 
-#### 使用说明
+  [openEuler和openHarmony通过分布式软总线通信](https://gitee.com/openeuler/distributed-codelabs/tree/master/dsoftbus/OhOeCommunication)
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+  [openEuler分布式软总线客户端示例](https://gitee.com/openeuler/distributed-codelabs/tree/master/dsoftbus/openEuler_softbus_client)
+
+- 分布式文件应用
+
+  
 
 #### 参与贡献
 
@@ -25,13 +26,3 @@ Distributed middleware code laboratory, mainly storing some application examples
 2.  新建 Feat_xxx 分支
 3.  提交代码
 4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
