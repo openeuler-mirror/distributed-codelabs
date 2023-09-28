@@ -524,8 +524,18 @@ static void ListDevice(void)
 		printf("Get no device!\n");
 		return;
 	}
-
-	node = GetDeviceInfo(1);
+	DeviceList* node1 = node;
+	num = 1;
+	while (node1 != NULL)
+	{
+		printf("DeviceInfo id: %d\n", num);
+		printf("device id: %d\n", node1->device.devId);
+		node1 = node1->next;
+		num++;
+	}
+	printf("please select device num: ");
+	scanf_s("%d", &num);
+	node = GetDeviceInfo(num);
 	if (node == NULL) {
 		printf("GetDeviceInfo fail\n");
 		return;
@@ -580,9 +590,7 @@ static void DeviceFound(const DeviceInfo* device)
 		printf("device:%s udid:%s is already in List\n", device->devName, device->devId);
 		return;
 	}
-	sleep(2);
 	SaveDeviceInfo(device);
-	ListDevice();
 }
 
 static void DiscoverySuccess(int subscribeId)
@@ -704,13 +712,11 @@ static void commnunicate(void)
 		timeout--;
 		sleep(2);
 	}
-
 	CloseSessionInterface(sessionId);
 err_OpenSessionInterface:
 err_input:
 	FreeNodeInfoInterface(dev);
 }
-
 
 int main()
 {
@@ -765,14 +771,19 @@ int main()
 		printf("DiscoveryInterface fail\n");
 		goto err_DiscoveryInterface;
 	}
-
+	
 	while (loop) {
+		
 		printf("\nInput l to list device;Input c to commuicate;Input s to stop:");
 		while (true) {
 			char c = getchar();
 			if (c == 'c') {
 				commnunicate();
 				continue;
+			}
+			else if (c == 'l')
+			{
+				ListDevice();
 			}
 			else if (c == 's') {
 				loop = false;
@@ -796,4 +807,5 @@ err_PublishServiceInterface:
 	return ret;
 
 }
+
 
