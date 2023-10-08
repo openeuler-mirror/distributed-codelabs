@@ -1,0 +1,118 @@
+From 5ef18e437ea494c167cd2176bda83abd6440176e Mon Sep 17 00:00:00 2001
+From: root <root@192.168.142.190>
+Date: Mon, 18 Sep 2023 11:30:46 +0800
+Subject: [PATCH] 001
+
+---
+ .../iso_task/iso_task_common.c                | 26 +++++++++++++------
+ .../pake_task/pake_task_common.c              | 24 ++++++++++++-----
+ 2 files changed, 36 insertions(+), 14 deletions(-)
+
+diff --git a/base/security/deviceauth/services/authenticators/src/account_unrelated/iso_task/iso_task_common.c b/base/security/deviceauth/services/authenticators/src/account_unrelated/iso_task/iso_task_common.c
+index 0292e9a..970df7a 100644
+--- a/base/security/deviceauth/services/authenticators/src/account_unrelated/iso_task/iso_task_common.c
++++ b/base/security/deviceauth/services/authenticators/src/account_unrelated/iso_task/iso_task_common.c
+@@ -379,25 +379,35 @@ static int FillPkgNameAndServiceType(IsoParams *params, const CJson *in)
+ static int FillPin(IsoParams *params, const CJson *in)
+ {
+     if (params->opCode == OP_BIND) {
++	bool pinFlag = true;
+         const char *pinString = GetStringFromJson(in, FIELD_PIN_CODE);
+         if (pinString == NULL) {
+             LOGE("Get pin failed.");
+             return HC_ERROR;
+         }
+-        if (strlen(pinString) < MIN_PIN_LEN || strlen(pinString) > MAX_PIN_LEN) {
++	if(strlen(pinString)==0)
++	    pinFlag = false;
++        if (pinFlag == true && (strlen(pinString) < MIN_PIN_LEN || strlen(pinString) > MAX_PIN_LEN)) {
+             LOGE("Pin is too short.");
+             return HC_ERR_INVALID_PARAMS;
+         }
+-        params->pinCodeString = (char *)HcMalloc(strlen(pinString) + 1, 0);
++        params->pinCodeString = (char *)HcMalloc(pinFlag ? strlen(pinString) + 1 : 6,0);
+         if (params->pinCodeString == NULL) {
+             LOGE("malloc pinCode failed.");
+             return HC_ERR_ALLOC_MEMORY;
+         }
+-        if (memcpy_s(params->pinCodeString, strlen(pinString) + 1, pinString, strlen(pinString)) != EOK) {
+-            LOGE("memcpy pinCodeString failed.");
+-            (void)memset_s(params->pinCodeString, strlen(pinString) + 1, 0, strlen(pinString) + 1);
+-            return HC_ERR_MEMORY_COPY;
+-        }
++	if(pinFlag)
++	{
++            if (memcpy_s(params->pinCodeString, strlen(pinString) + 1, pinString, strlen(pinString)) != EOK) {
++                LOGE("memcpy pinCodeString failed.");
++                (void)memset_s(params->pinCodeString, strlen(pinString) + 1, 0, strlen(pinString) + 1);
++                return HC_ERR_MEMORY_COPY;
++	    }
++	}
++	else
++	{
++		LOGI("NOPIN");
++	}
+     }
+     return HC_SUCCESS;
+ }
+@@ -516,7 +526,7 @@ static int AuthGeneratePsk(const Uint8Buff *seed, IsoParams *params)
+ 
+ static int AuthGeneratePskUsePin(const Uint8Buff *seed, IsoParams *params, const char *pinString)
+ {
+-    Uint8Buff messageBuf = { (uint8_t *)pinString, (uint32_t)strlen(pinString) };
++    Uint8Buff messageBuf = { (uint8_t *)pinString,(uint32_t)strlen(pinString) };
+     Uint8Buff pskBuf = { params->baseParams.psk, sizeof(params->baseParams.psk) };
+     uint8_t hash[SHA256_LEN] = { 0 };
+     Uint8Buff hashBuf = { hash, sizeof(hash) };
+diff --git a/base/security/deviceauth/services/authenticators/src/account_unrelated/pake_task/pake_task_common.c b/base/security/deviceauth/services/authenticators/src/account_unrelated/pake_task/pake_task_common.c
+index c617af6..21534ea 100644
+--- a/base/security/deviceauth/services/authenticators/src/account_unrelated/pake_task/pake_task_common.c
++++ b/base/security/deviceauth/services/authenticators/src/account_unrelated/pake_task/pake_task_common.c
+@@ -107,26 +107,38 @@ ERR:
+ 
+ static int32_t FillPskWithPin(PakeParams *params, const CJson *in)
+ {
++    bool pinFlag = true;
+     const char *pinString = GetStringFromJson(in, FIELD_PIN_CODE);
+     if (pinString == NULL) {
+         LOGE("Get pin code failed.");
+         return HC_ERR_JSON_GET;
+     }
+-    if (strlen(pinString) < MIN_PIN_LEN || strlen(pinString) > MAX_PIN_LEN) {
++    if(strlen(pinString)==0)
++        pinFlag = false;
++    if (pinFlag == true && (strlen(pinString) < MIN_PIN_LEN || strlen(pinString) > MAX_PIN_LEN)) {
+         LOGE("Pin code len is invalid.");
+         return HC_ERR_INVALID_LEN;
+     }
+ 
+-    int res = InitSingleParam(&(params->baseParams.psk), strlen(pinString));
++    int res = InitSingleParam(&(params->baseParams.psk),pinFlag ? strlen(pinString) : 5);
+     if (res != HC_SUCCESS) {
+         LOGE("InitSingleParam for psk failed, res: %d.", res);
+         return res;
+     }
+-    if (memcpy_s(params->baseParams.psk.val, params->baseParams.psk.length,
++    if(pinFlag)
++    {
++        if (memcpy_s(params->baseParams.psk.val, params->baseParams.psk.length,
+         pinString, strlen(pinString)) != HC_SUCCESS) {
+-        LOGE("Memcpy for pin code failed.");
+-        FreeAndCleanKey(&params->baseParams.psk);
+-        return HC_ERR_MEMORY_COPY;
++            LOGE("Memcpy for pin code failed.");
++            FreeAndCleanKey(&params->baseParams.psk);
++            return HC_ERR_MEMORY_COPY;
++   	}
++	
++    }
++    else
++    {
++	
++        params->baseParams.psk.length = 5;
+     }
+ 
+     return HC_SUCCESS;
+-- 
+2.33.0
+
