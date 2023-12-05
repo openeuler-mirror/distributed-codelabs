@@ -1,0 +1,77 @@
+{
+    "name": "@ohos/device_security_level",
+    "description": "openharmony's device security level management",
+    "version": "3.0.0",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "base/security/device_security_level"
+    },
+    "dirs": {},
+    "scripts": {},
+    "author": {},
+    "repository": "",
+    "component": {
+        "name": "device_security_level",
+        "subsystem": "security",
+        "syscap": [
+            "SystemCapability.Security.DeviceSecurityLevel"
+        ],
+        "features": [
+            "device_security_level_feature_coverage = false"
+        ],
+        "hisysevent_config": [
+            "//base/security/device_security_level/hisysevent.yaml"
+        ],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "200KB",
+        "ram": "2500KB",
+        "deps": {
+            "components": [
+                "huks",
+                "dsoftbus",
+                "safwk",
+                "utils_base",
+                "ipc",
+                "samgr",
+                "hisysevent_native",
+                "device_auth",
+                "hilog_native"
+            ],
+            "third_party": [
+                "cjson"
+            ]
+        },
+        "build": {
+            "group_type": {
+                "base_group": [],
+                "fwk_group": [
+                    "//base/security/device_security_level/interfaces/inner_api:dslm_sdk"
+                ],
+                "service_group": [
+                    "//base/security/device_security_level/oem_property/ohos:dslm_service",
+                    "//base/security/device_security_level/oem_property/ohos:dslm_ohos_cred_file",
+                    "//base/security/device_security_level/profile:dslm_service.rc"
+                ]
+            },
+            "inner_kits": [
+                {
+                    "name": "//base/security/device_security_level/interfaces/inner_api:dslm_sdk",
+                    "header": {
+                        "header_files": [
+                            "device_security_info.h",
+                            "device_security_defines.h"
+                        ],
+                        "header_base": "//base/security/device_security_level/interfaces/inner_api/include"
+                    }
+                }
+            ],
+            "test": [
+                "//base/security/device_security_level/test/dslm_unit_test:dslm_test",
+                "//base/security/device_security_level/test/dslm_fuzz_test:dslm_fuzz"
+            ]
+        }
+    }
+}

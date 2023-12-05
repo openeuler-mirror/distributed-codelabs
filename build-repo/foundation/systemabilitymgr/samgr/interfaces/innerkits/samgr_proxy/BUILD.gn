@@ -1,0 +1,60 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+
+config("samgr_proxy_config") {
+  include_dirs = [ "include" ]
+}
+
+config("samgr_proxy_private_config") {
+  include_dirs = [
+    "include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/lsamgr",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/include",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
+  ]
+}
+
+ohos_shared_library("samgr_proxy") {
+  defines = [ "SAMGR_PROXY" ]
+  sources = [
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_load_callback_stub.cpp",
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_manager_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/frameworks/native/source/system_ability_status_change_stub.cpp",
+    "//foundation/systemabilitymgr/samgr/services/lsamgr/src/local_ability_manager_proxy.cpp",
+    "//foundation/systemabilitymgr/samgr/services/samgr/native/source/service_registry.cpp",
+  ]
+  configs = [
+    ":samgr_proxy_private_config",
+    "//foundation/systemabilitymgr/samgr/test/resource:coverage_flags",
+  ]
+
+  all_dependent_configs = [ ":samgr_proxy_config" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
+
+    part_name = "samgr"
+  }
+
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-pub-sdk"
+  subsystem_name = "systemabilitymgr"
+}

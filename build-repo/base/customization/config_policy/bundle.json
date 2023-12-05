@@ -1,0 +1,55 @@
+{
+  "name": "@ohos/customization_config_policy",
+  "description": "The customization framework, namely, cust, provides APIs for each service module to obtain the configuration directories at different levels or the configuration file paths.",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "base/customization/config_policy"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "config_policy",
+    "subsystem": "customization",
+    "syscap": [ "SystemCapability.Customization.ConfigPolicy" ],
+    "features": [],
+    "adapted_system_type": [ "standard", "small" ],
+    "hisysevent_config": [
+      "//base/customization/config_policy/frameworks/dfx/hisysevent.yaml"
+    ],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "common",
+        "hisysevent_native",
+        "hiviewdfx_hilog_native",
+        "napi",
+        "init"
+      ],
+      "third_party": [
+        "bounds_checking_function"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//base/customization/config_policy:config_policy_components"
+      ],
+      "inner_kits": [
+        {
+          "header": {
+            "header_base": "//base/customization/config_policy/interfaces/inner_api/include",
+            "header_files": [
+              "config_policy_utils.h"
+            ]
+          },
+          "name": "//base/customization/config_policy/frameworks/config_policy:configpolicy_util"
+        }
+      ],
+      "test": [
+        "//base/customization/config_policy/test/unittest:ConfigPolicyUtilsTest"
+      ]
+    }
+  }
+}

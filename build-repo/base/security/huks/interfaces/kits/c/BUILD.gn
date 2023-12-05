@@ -1,0 +1,70 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+ohos_ndk_library("libhuks_ndk") {
+  output_name = "huks_ndk"
+  output_extension = "z.so"
+  ndk_description_file = "./libhuks.ndk.json"
+  min_compact_version = "1"
+
+  # system_capability = "SystemCapability.Security.Huks"
+}
+
+ohos_ndk_headers("huks_header") {
+  dest_dir = "$ndk_headers_out_dir/huks"
+  sources = [
+    "./include/native_huks_api.h",
+    "./include/native_huks_param.h",
+    "./include/native_huks_type.h",
+  ]
+}
+
+config("huks_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("huks_ndk") {
+  public_configs = [ ":huks_config" ]
+  defines = [
+    # "L2_STANDARD",
+    "_HARDWARE_ROOT_KEY_",
+    "_HUKS_LOG_ENABLE_",
+  ]
+
+  include_dirs = [
+    "//base/security/huks/interfaces/kits/c/include",
+    "//base/security/huks/interfaces/innerkits/huks_standard/main/include",
+    "//base/security/huks/frameworks/huks_standard/main/common/include",
+  ]
+
+  sources = [
+    "//base/security/huks/interfaces/kits/c/src/native_huks_api_adapter.c",
+    "src/native_huks_api.c",
+    "src/native_huks_param.c",
+  ]
+
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "huks:libhukssdk",
+  ]
+
+  cflags_cc = [
+    "-Wall",
+    "-Werror",
+  ]
+
+  part_name = "huks"
+  subsystem_name = "security"
+}

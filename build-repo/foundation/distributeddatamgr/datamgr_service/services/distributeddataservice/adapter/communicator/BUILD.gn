@@ -1,0 +1,67 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+ohos_static_library("distributeddata_communicator_static") {
+  sources = [
+    "src/app_pipe_handler.cpp",
+    "src/app_pipe_handler.h",
+    "src/app_pipe_mgr.cpp",
+    "src/app_pipe_mgr.h",
+    "src/ark_communication_provider.cpp",
+    "src/ark_communication_provider.h",
+    "src/communication_provider.cpp",
+    "src/communication_provider_impl.cpp",
+    "src/communication_provider_impl.h",
+    "src/communication_strategy.cpp",
+    "src/communication_strategy.h",
+    "src/data_buffer.cpp",
+    "src/device_manager_adapter.cpp",
+    "src/process_communicator_impl.cpp",
+    "src/softbus_adapter.h",
+    "src/softbus_adapter_standard.cpp",
+  ]
+
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "../include/communicator",
+    "../include/dfx",
+    "../include/log",
+    "../include/autils",
+    "../include/utils",
+    "//foundation/communication/dsoftbus/core/common/include",
+    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/kv_store/frameworks/common",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb/interfaces/include",
+    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb/include",
+    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb/interfaces/include/relational",
+  ]
+
+  cflags_cc = [ "-fvisibility=hidden",
+                "-Wno-sign-compare",]
+
+  deps = [
+    "../dfx:distributeddata_dfx_static",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter/utils:distributeddata_utils_static",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "dsoftbus:softbus_client",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "datamgr_service"
+}

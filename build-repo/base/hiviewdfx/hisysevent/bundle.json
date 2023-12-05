@@ -1,0 +1,74 @@
+{
+  "name": "@ohos/hisysevent_native",
+  "description": "System event logging",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "base/hiviewdfx/hisysevent"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "hisysevent_native",
+    "subsystem": "hiviewdfx",
+    "syscap": [
+      "SystemCapability.HiviewDFX.HiSysEvent"
+    ],
+    "adapted_system_type": [
+      "standard"
+    ],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "c_utils",
+        "hilog_native",
+        "hitrace_native",
+        "ipc",
+        "napi",
+        "safwk",
+        "samgr"
+      ],
+      "third_party": [
+        "bounds_checking_function",
+        "jsoncpp"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent:libhisysevent",
+        "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent_manager:libhisyseventmanager",
+        "//base/hiviewdfx/hisysevent/interfaces/js/kits:hisysevent_napi",
+        "//base/hiviewdfx/hisysevent/frameworks/native:hisysevent"
+      ],
+      "inner_kits": [
+        {
+          "name": "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent:libhisysevent",
+          "header": {
+            "header_files": [
+              "hisysevent_c.h",
+              "hisysevent.h"
+            ],
+            "header_base": "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include"
+          }
+        },
+        {
+          "name": "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent_manager:libhisyseventmanager",
+          "header": {
+            "header_files": [
+              "hisysevent_manager_c.h",
+              "hisysevent_manager.h"
+            ],
+            "header_base": "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent_manager/include"
+          }
+        }
+      ],
+      "test": [
+        "//base/hiviewdfx/hisysevent/test:moduletest",
+        "//base/hiviewdfx/hisysevent/test:unittest",
+        "//base/hiviewdfx/hisysevent/test:fuzztest"
+      ]
+    }
+  }
+}

@@ -1,0 +1,39 @@
+<!--
+Copyright (c) 2022 Huawei Device Co., Ltd.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="container">
+    <div style="flex-direction: row; height: 70px; align-content: flex-start;">
+        <text style="width:200px; font-size : 50px;  text-align : left; background-color : beige;">备忘录
+        </text>
+        <image style = "fit-original-size: true;height: 70px;width: 70px;" src="{{ dataModel.imgSrc }}"></image>
+    </div>
+    <list class="documents" divider="true" style="background-color : antiquewhite; height : 80%;">
+        <list-item for="{{ dataModel.documentList }}">
+            <div style="background-color : azure; width : 100%; flex-direction : column;"
+                 onclick="detail" if="{{$item != null}}" data-title="{{ $item.title }}" data-content="{{ $item.content }}" data-index="{{ $item.index }}">
+                <text>{{ $item.title }}</text>
+                <text>{{ $item.content }}</text>
+            </div>
+        </list-item>
+    </list>
+    <div>
+        <text>总数：</text>
+        <text id = "totalSize">{{dataModel.distributedObject.documentSize}}</text>
+    </div>
+    <div>
+        <input type="button" class="btn" onclick="add">添加</input>
+        <input type="button" class="btn" onclick="clear">清空</input>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//build/ohos/sa_profile/sa_profile.gni")
+import("//foundation/filemanagement/dfs_service/distributedfile.gni")
+
+ohos_sa_profile("distributedfile_sa_profile") {
+  sources = [ "5201.xml" ]
+  part_name = "dfs_service"
+}
+
+ohos_prebuilt_etc("distributedfile_etc") {
+  source = "distributedfile.cfg"
+  relative_install_dir = "init"
+  part_name = "dfs_service"
+  subsystem_name = "filemanagement"
+}
+
+ohos_prebuilt_etc("distributed_file.para") {
+  source = "distributed_file.para"
+  part_name = "dfs_service"
+  module_install_dir = "etc/param"
+}

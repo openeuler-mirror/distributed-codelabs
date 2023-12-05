@@ -1,0 +1,70 @@
+{
+  "name": "@ohos/hitrace_native",
+  "description": "cross-thread, cross-process, and cross-device service call chain",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "base/hiviewdfx/hitrace"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "hitrace_native",
+    "subsystem": "hiviewdfx",
+    "syscap": [
+      "SystemCapability.HiviewDFX.HiTrace"
+    ],
+    "adapted_system_type": [
+      "standard"
+    ],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "c_utils",
+        "hilog_native",
+        "init",
+        "ipc",
+        "napi"
+      ],
+      "third_party": []
+    },
+    "build": {
+      "sub_component": [
+        "//base/hiviewdfx/hitrace/cmd:hitrace_target",
+        "//base/hiviewdfx/hitrace/cmd:hitrace.cfg",
+        "//base/hiviewdfx/hitrace/interfaces/native/innerkits:hitrace_meter",
+        "//base/hiviewdfx/hitrace/interfaces/native/innerkits:libhitracechain",
+        "//base/hiviewdfx/hitrace/interfaces/js/kits:hitrace_napi"
+      ],
+      "inner_kits": [
+        {
+          "type": "so",
+          "name": "//base/hiviewdfx/hitrace/interfaces/native/innerkits:hitrace_meter",
+          "header": {
+            "header_base": "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter/",
+            "header_files": [
+              "hitrace_meter.h"
+            ]
+          }
+        },
+        {
+          "type": "so",
+          "name": "//base/hiviewdfx/hitrace/interfaces/native/innerkits:libhitracechain",
+          "header": {
+            "header_base": "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/",
+            "header_files": [
+              "hitrace/hitracechain.h",
+              "hitrace/hitracechainc.h",
+              "hitrace/hitraceid.h",
+              "hitrace/trace.h",
+              "hitrace/tracechain.h"
+            ]
+          }
+        }
+      ],
+      "test": [ "//base/hiviewdfx/hitrace/test:unittest" ]
+    }
+  }
+}

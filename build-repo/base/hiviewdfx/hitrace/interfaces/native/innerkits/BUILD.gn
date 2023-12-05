@@ -1,0 +1,99 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("libhitrace_pub_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("libhitracechain") {
+  public_configs = [ ":libhitrace_pub_config" ]
+
+  deps = [ "//base/hiviewdfx/hitrace/frameworks/native:hitracechain_source" ]
+
+  external_deps = [ "hilog_native:libhilog" ]
+
+  output_extension = "so"
+  if (build_public_version) {
+    install_enable = true
+  } else {
+    install_enable = false
+  }
+
+  part_name = "hitrace_native"
+  subsystem_name = "hiviewdfx"
+}
+
+config("hitrace_meter_config") {
+  visibility = [ ":*" ]
+  include_dirs = [ "include/hitrace_meter" ]
+}
+
+ohos_static_library("hitrace_inner") {
+  sources = [ "src/hitrace_meter.cpp" ]
+  public_configs = [ ":hitrace_meter_config" ]
+  external_deps = [
+    "hilog_native:libhilog",
+    "init:libbeget_proxy",
+    "init:libbegetutil",
+  ]
+
+  part_name = "hitrace_native"
+  subsystem_name = "hiviewdfx"
+}
+
+ohos_shared_library("hitrace_meter") {
+  public_configs = [ ":hitrace_meter_config" ]
+  deps = [
+    ":hitrace_etc",
+    ":hitrace_inner",
+  ]
+  external_deps = [ "c_utils:utils" ]
+  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
+  output_extension = "so"
+
+  part_name = "hitrace_native"
+  subsystem_name = "hiviewdfx"
+}
+
+ohos_prebuilt_etc("hitrace.para") {
+  source = "hitrace.para"
+  install_images = [
+    "system",
+    "updater",
+  ]
+  module_install_dir = "etc/param"
+  part_name = "hitrace_native"
+  subsystem_name = "hiviewdfx"
+}
+
+ohos_prebuilt_etc("hitrace.para.dac") {
+  source = "hitrace.para.dac"
+  install_images = [
+    "system",
+    "updater",
+  ]
+  module_install_dir = "etc/param"
+  part_name = "hitrace_native"
+  subsystem_name = "hiviewdfx"
+}
+
+group("hitrace_etc") {
+  deps = [
+    ":hitrace.para",
+    ":hitrace.para.dac",
+  ]
+}

@@ -1,0 +1,200 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
+
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagerutils_mini") {
+      include_dirs = [
+        "${utils_path}/include",
+        "${utils_path}/include/dfx",
+        "${utils_path}/include/dfx/lite",
+        "${utils_path}/include/permission/lite",
+        "${common_path}/include",
+        "${innerkits_path}/native_cpp/include",
+      ]
+
+      include_dirs += [
+        "//base/security/device_auth/interfaces/innerkits",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
+        "//commonlibrary/utils_lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      ]
+
+      sources = [
+        "${utils_path}/src/dfx/lite/dm_hidumper.cpp",
+        "${utils_path}/src/dfx/lite/dm_hisysevent.cpp",
+        "${utils_path}/src/dfx/lite/dm_hitrace.cpp",
+        "${utils_path}/src/dm_anonymous.cpp",
+        "${utils_path}/src/dm_error_message.cpp",
+        "${utils_path}/src/dm_log.cpp",
+        "${utils_path}/src/dm_random.cpp",
+        "${utils_path}/src/permission/lite/permission_manager.cpp",
+      ]
+
+      defines = [
+        "__LITEOS_M__",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerutils\"",
+        "LOG_DOMAIN=0xD004100",
+      ]
+
+      deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
+        "//commonlibrary/utils_lite:utils",
+        "//foundation/systemabilitymgr/samgr_lite/samgr",
+        "//third_party/bounds_checking_function:libsec_static",
+        "//third_party/mbedtls",
+        "//third_party/mbedtls:mbedtls_shared",
+      ]
+    }
+  } else {
+    shared_library("devicemanagerutils") {
+      include_dirs = [
+        "${common_path}/include",
+        "${common_path}/include/ipc",
+        "${common_path}/include/ipc/lite",
+        "${common_path}/include/ipc/model",
+        "${common_path}/include/dfx",
+        "${common_path}/include/dfx/lite",
+        "${innerkits_path}/native_cpp/include",
+        "include",
+        "include/fwkload/lite",
+        "include/permission/lite",
+      ]
+      include_dirs += [
+        "//base/security/device_auth/interfaces/innerkits",
+        "//base/startup/init/interfaces/innerkits/include/syspara",
+        "//commonlibrary/utils_lite/include",
+        "//utils/system/safwk/native/include",
+        "//third_party/json/include",
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+        "//third_party/bounds_checking_function/include",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+        "//foundation/communication/dsoftbus/interfaces/kits/transport",
+        "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      ]
+      sources = [
+        "${common_path}/src/dfx/lite/dm_hidumper.cpp",
+        "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
+        "${common_path}/src/dfx/lite/dm_hitrace.cpp",
+        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_error_message.cpp",
+        "${common_path}/src/dm_log.cpp",
+        "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
+        "src/dm_random.cpp",
+        "src/fwkload/lite/dm_distributed_hardware_load.cpp",
+        "src/permission/lite/permission_manager.cpp",
+      ]
+      defines = [
+        "LITE_DEVICE",
+        "hI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerutils\"",
+        "lOG_DOMAIN=0xD004100",
+      ]
+      deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//base/startup/init/interfaces/innerkits:libbegetutil",
+        "//commonlibrary/utils_lite:utils",
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//third_party/mbedtls:mbedtls_shared",
+      ]
+    }
+  }
+} else {
+  config("devicemanagerutils_config") {
+    include_dirs = [
+      "include",
+      "include/fwkload/standard",
+      "include/permission/standard",
+      "${common_path}/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/model",
+      "${common_path}/include/ipc/standard",
+      "${common_path}/include/dfx",
+      "${common_path}/include/dfx/standard",
+      "${innerkits_path}/native_cpp/include",
+      "//third_party/mbedtls/include/mbedtls",
+      "//foundation/bundlemanager/bundle_framework/interfaces/inner_api/appexecfwk_base/include",
+      "//third_party/json/include",
+      "//foundation/ability/ability_base/interfaces/kits/native/want/include",
+      "//foundation/ability/ability_base/interfaces/kits/native/uri/include",
+      "//foundation/ability/ability_base/interfaces/inner_api/base/include",
+    ]
+  }
+
+  ohos_shared_library("devicemanagerutils") {
+    sources = [
+      "${common_path}/src/dfx/standard/dm_hidumper.cpp",
+      "${common_path}/src/dfx/standard/dm_hisysevent.cpp",
+      "${common_path}/src/dfx/standard/dm_hitrace.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_error_message.cpp",
+      "${common_path}/src/dm_log.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "src/dm_random.cpp",
+    ]
+    if (support_jsapi) {
+      sources += [
+        "src/fwkload/standard/dm_distributed_hardware_load.cpp",
+        "src/permission/standard/permission_manager.cpp",
+      ]
+    }
+
+    public_configs = [ ":devicemanagerutils_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerutils\"",
+      "LOG_DOMAIN=0xD004100",
+    ]
+
+    deps = [ "//third_party/mbedtls:mbedtls_shared" ]
+
+    external_deps = [
+      #"access_token:libaccesstoken_sdk",
+      "c_utils:utils",
+      #"hisysevent_native:libhisysevent",
+      #"hitrace_native:hitrace_meter",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "samgr:samgr_proxy",
+    ]
+    if (support_jsapi) {
+      external_deps += [ "bundle_framework:appexecfwk_core" ]
+    }
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+}

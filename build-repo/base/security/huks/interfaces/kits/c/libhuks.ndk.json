@@ -1,0 +1,71 @@
+[
+    {
+        "name": "OH_Huks_GetSdkVersion"
+    },
+    {
+        "name": "OH_Huks_GenerateKeyItem"
+    },
+    {
+        "name": "OH_Huks_ImportKeyItem"
+    },
+    {
+        "name": "OH_Huks_ImportWrappedKeyItem"
+    },
+    {
+        "name": "OH_Huks_ExportPublicKeyItem"
+    },
+    {
+        "name": "OH_Huks_DeleteKeyItem"
+    },
+    {
+        "name": "OH_Huks_GetKeyItemParamSet"
+    },
+    {
+        "name": "OH_Huks_IsKeyItemExist"
+    },
+    {
+        "name": "OH_Huks_AttestKeyItem"
+    },
+    {
+        "name": "OH_Huks_InitSession"
+    },
+    {
+        "name": "OH_Huks_UpdateSession"
+    },
+    {
+        "name": "OH_Huks_FinishSession"
+    },
+    {
+        "name": "OH_Huks_AbortSession"
+    },
+    {
+        "name": "OH_Huks_InitParamSet"
+    },
+    {
+        "name": "OH_Huks_AddParams"
+    },
+    {
+        "name": "OH_Huks_BuildParamSet"
+    },
+    {
+        "name": "OH_Huks_FreeParamSet"
+    },
+    {
+        "name": "OH_Huks_CopyParamSet"
+    },
+    {
+        "name": "OH_Huks_GetParam"
+    },
+    {
+        "name": "OH_Huks_FreshParamSet"
+    },
+    {
+        "name": "OH_Huks_IsParamSetTagValid"
+    },
+    {
+        "name": "OH_Huks_IsParamSetValid"
+    },
+    {
+        "name": "OH_Huks_CheckParamMatch"
+    }
+]

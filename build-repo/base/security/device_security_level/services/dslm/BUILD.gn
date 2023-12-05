@@ -1,0 +1,72 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+service_dslm_sources = [
+  "dslm_core_process.c",
+  "dslm_credential.c",
+  "dslm_device_list.c",
+  "dslm_dfx_default.c",
+  "dslm_fsm_process.c",
+  "dslm_hievent.c",
+  "dslm_inner_process.c",
+  "dslm_msg_utils.c",
+]
+
+service_dslm_include_dirs = [
+  "//base/security/device_security_level/common/include",
+  "//base/security/device_security_level/interfaces/inner_api/include",
+  "//base/security/device_security_level/services/include",
+]
+
+# service_dslm object
+ohos_source_set("service_dslm_obj") {
+  sources = service_dslm_sources
+  include_dirs = service_dslm_include_dirs
+  deps = [ "//base/security/device_security_level/baselib/utils:utils_static" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+  ]
+  defines = [
+    "MAX_SEND_TIMES=5",
+    "SEND_MSG_TIMEOUT_LEN=40000",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}
+
+# service_dslm object, only for test
+ohos_source_set("service_dslm_test_obj") {
+  testonly = true
+  sources = service_dslm_sources
+  include_dirs = service_dslm_include_dirs
+  deps = [ "//base/security/device_security_level/baselib/utils:utils_static" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+  ]
+  defines = [
+    "MAX_SEND_TIMES=5",
+    "SEND_MSG_TIMEOUT_LEN=500",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}

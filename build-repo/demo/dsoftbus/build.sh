@@ -1,0 +1,1 @@
+g++ --std=c++17 -Wall -Werror -I./ -I/usr/include/dsoftbus -I/usr/include/hilog softbus_adapter.cpp softbus_client.cpp -lsoftbus_client.z -lhilog.z -o softbus_client

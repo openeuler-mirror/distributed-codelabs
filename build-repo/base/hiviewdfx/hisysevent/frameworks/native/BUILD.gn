@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+group("hisyseventcat_package") {
+  # root of all the hiview dependencies
+  deps = [ ":hisysevent" ]
+}
+
+ohos_executable("hisysevent") {
+  install_enable = true
+
+  include_dirs = [
+    ".",
+    "include",
+    "//utils/system/safwk/native/include",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
+  ]
+
+  public_configs =
+      [ "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_impl_config" ]
+
+  deps = [
+    "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_impl_client",
+    "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_service_gen_src_client",
+    "//third_party/jsoncpp:jsoncpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+    "hisysevent_native:libhisysevent",
+    "hisysevent_native:libhisyseventmanager",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  sources = [
+    "hisysevent_json_decorator.cpp",
+    "hisysevent_tool.cpp",
+    "hisysevent_tool_listener.cpp",
+    "hisysevent_tool_query.cpp",
+    "json_flatten_parser.cpp",
+    "main.cpp",
+  ]
+
+  part_name = "hisysevent_native"
+  subsystem_name = "hiviewdfx"
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ "test:unittest" ]
+}

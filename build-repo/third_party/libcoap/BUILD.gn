@@ -1,0 +1,148 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cflags = [
+  "-DCOAP_SUPPORT_SOCKET_BROADCAST",
+  "-DCOAP_USER_DEFAULT_PORT=5684",
+]
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  cflags += [
+    "-Wall",
+    "-fPIC",
+    "-std=c99",
+  ]
+  cflags_cc = cflags
+  ldflags = [ "-fPIC" ]
+  config("libcoap_config") {
+    include_dirs = [
+      "include",
+      "//third_party/bounds_checking_function/include",
+    ]
+    defines = [ "_GNU_SOURCE" ]
+  }
+  source_set("libcoap_src") {
+    sources = [
+      "src/address.c",
+      "src/async.c",
+      "src/block.c",
+      "src/coap_asn1.c",
+      "src/coap_cache.c",
+      "src/coap_debug.c",
+      "src/coap_event.c",
+      "src/coap_gnutls.c",
+      "src/coap_hashkey.c",
+      "src/coap_io.c",
+      "src/coap_mbedtls.c",
+      "src/coap_notls.c",
+      "src/coap_openssl.c",
+      "src/coap_prng.c",
+      "src/coap_session.c",
+      "src/coap_tcp.c",
+      "src/coap_time.c",
+      "src/coap_tinydtls.c",
+      "src/encode.c",
+      "src/mem.c",
+      "src/net.c",
+      "src/option.c",
+      "src/pdu.c",
+      "src/resource.c",
+      "src/str.c",
+      "src/subscribe.c",
+      "src/uri.c",
+    ]
+    configs += [ ":libcoap_config" ]
+  }
+  static_library("libcoap_static") {
+    deps = [
+      ":libcoap_src",
+      "//third_party/bounds_checking_function:libsec_static",
+    ]
+    public_configs = [ ":libcoap_config" ]
+  }
+
+  shared_library("libcoap") {
+    deps = [
+      ":libcoap_src",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    public_configs = [ ":libcoap_config" ]
+  }
+} else {
+  import("//build/ohos.gni")
+  cflags_cc = cflags
+
+  config("libcoap_config") {
+    include_dirs = [
+      "include",
+      "//third_party/bounds_checking_function/include",
+    ]
+  }
+
+  ohos_source_set("libcoap_src") {
+    sources = [
+      "src/address.c",
+      "src/async.c",
+      "src/block.c",
+      "src/coap_asn1.c",
+      "src/coap_cache.c",
+      "src/coap_debug.c",
+      "src/coap_event.c",
+      "src/coap_gnutls.c",
+      "src/coap_hashkey.c",
+      "src/coap_io.c",
+      "src/coap_mbedtls.c",
+      "src/coap_notls.c",
+      "src/coap_openssl.c",
+      "src/coap_prng.c",
+      "src/coap_session.c",
+      "src/coap_tcp.c",
+      "src/coap_time.c",
+      "src/coap_tinydtls.c",
+      "src/encode.c",
+      "src/mem.c",
+      "src/net.c",
+      "src/option.c",
+      "src/pdu.c",
+      "src/resource.c",
+      "src/str.c",
+      "src/subscribe.c",
+      "src/uri.c",
+    ]
+    configs = [ ":libcoap_config" ]
+  }
+
+  ohos_static_library("libcoap_static") {
+    deps = [
+      ":libcoap_src",
+      "//third_party/bounds_checking_function:libsec_static",
+    ]
+    public_configs = [ ":libcoap_config" ]
+  }
+
+  ohos_shared_library("libcoap") {
+    deps = [
+      ":libcoap_src",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    public_configs = [ ":libcoap_config" ]
+    subsystem_name = "communication"
+    if (defined(oem_commercial_build) && oem_commercial_build) {
+      part_name = "softbus"
+    } else {
+      defines = [ "STANDARD_SYSTEM_ENABLE" ]
+      part_name = "dsoftbus"
+    }
+  }
+}

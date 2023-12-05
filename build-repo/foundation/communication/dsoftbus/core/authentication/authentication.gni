@@ -1,0 +1,83 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//foundation/communication/dsoftbus/dsoftbus.gni")
+AUTH_SERVER_DEFINES = []
+if (dsoftbus_feature_auth_account == true) {
+  AUTH_SERVER_DEFINES += [ "AUTH_ACCOUNT" ]
+}
+
+authentication_path = "$dsoftbus_root_path/core/authentication"
+native_source_path = rebase_path("$dsoftbus_root_path")
+auth_dir = "dsoftbus_enhance/core/authentication/src"
+enhanced = exec_script("$dsoftbus_root_path/check_sub_module.py",
+                       [
+                         "$native_source_path",
+                         "$auth_dir",
+                       ],
+                       "value")
+
+if (dsoftbus_feature_lnn_net) {
+  auth_server_src = [
+    "$authentication_path/src/auth_common.c",
+    "$authentication_path/src/auth_connection.c",
+    "$authentication_path/src/auth_hichain.c",
+    "$authentication_path/src/auth_manager.c",
+    "$authentication_path/src/auth_config.c",
+    "$authentication_path/src/auth_request.c",
+    "$authentication_path/src/auth_session_fsm.c",
+    "$authentication_path/src/auth_session_key.c",
+    "$authentication_path/src/auth_session_message.c",
+    "$authentication_path/src/auth_interface.c",
+  ]
+  if (enhanced) {
+    auth_server_src += [ "$dsoftbus_root_path/dsoftbus_enhance/core/authentication/src/auth_meta_manager.c" ]
+  } else {
+    auth_server_src +=
+        [ "$authentication_path/src/virtual/auth_meta_manager_virtual.c" ]
+  }
+  if (dsoftbus_feature_ip_auth) {
+    auth_server_src +=
+        [ "$dsoftbus_root_path/core/authentication/src/auth_tcp_connection.c" ]
+  } else {
+    auth_server_src += [ "$dsoftbus_root_path/core/authentication/src/virtual/auth_tcp_connection_virtual.c" ]
+  }
+} else {
+  auth_server_src = [
+    "$authentication_path/src/virtual/auth_interface_virtual.c",
+    "$authentication_path/src/virtual/auth_tcp_connection_virtual.c",
+    "$authentication_path/src/virtual/auth_meta_manager_virtual.c",
+  ]
+}
+auth_server_inc = [
+  "$dsoftbus_root_path/core/authentication/include",
+  "$dsoftbus_root_path/core/authentication/interface",
+]
+auth_server_deps = []
+
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    auth_server_inc += [ "//base/security/device_auth/interfaces/innerkits" ]
+    if (dsoftbus_feature_lnn_net) {
+      auth_server_deps += [ "//base/security/device_auth/services:deviceauth" ]
+    }
+  } else {
+    auth_server_inc += [ "//third_party/cJSON" ]
+    if (dsoftbus_feature_lnn_net) {
+      auth_server_deps +=
+          [ "//base/security/device_auth/services:deviceauth_sdk" ]
+    }
+  }
+} else {
+  auth_server_inc += [ "//base/security/device_auth/interfaces/innerkits" ]
+}

@@ -1,0 +1,148 @@
+{
+  "product_name": "openeuler",
+  "device_company": "kunpeng",
+  "target_cpu": "arm64",
+  "target_os": "linux",
+  "type": "standard",
+  "version": "3.0",
+  "board": "openeuler",
+  "api_version": 8,
+  "enable_ramdisk": false,
+  "build_selinux": false,
+  "build_seccomp": false,
+  "support_jsapi": false,
+  "inherit": [],
+  "subsystems": [
+    {
+      "subsystem": "distributeddatamgr",
+      "components": [
+        {
+          "component": "kv_store",
+          "features": []
+        },
+        {
+          "component": "relational_store",
+          "features": []
+        },
+        {
+          "component": "datamgr_service",
+          "features": []
+        },
+        {
+          "component": "data_object",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "commonlibrary",
+      "components": [
+        {
+          "component": "c_utils"
+        }
+      ]
+    },
+    {
+      "subsystem": "startup",
+      "components": [
+        {
+          "component": "init"
+        }
+      ]
+    },
+    {
+      "subsystem": "communication",
+      "components": [
+        {
+          "component": "ipc"
+        },
+        {
+          "component": "dsoftbus",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "systemabilitymgr",
+      "components": [
+        {
+          "component": "samgr"
+        },
+        {
+          "component": "safwk"
+        }
+      ]
+    },
+    {
+      "subsystem": "notification",
+      "components": [
+        {
+          "component": "eventhandler"
+        }
+      ]
+    },
+    {
+      "subsystem": "customization",
+      "components": [
+        {
+          "component": "config_policy",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "distributedhardware",
+      "components": [
+        {
+          "component": "device_manager",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "security",
+      "components": [
+        {
+          "component": "huks",
+          "features": []
+        },
+        {
+          "component": "access_token",
+          "features": []
+        },
+        {
+          "component": "device_auth",
+          "features": []
+        },
+        {
+          "component": "dataclassification",
+          "features": []
+        },
+        {
+          "component": "device_security_level",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "hiviewdfx",
+      "components": [
+        {
+          "component": "hilog_native"
+        },
+        {
+          "component": "hiviewdfx_hilog_native"
+        }
+      ]
+    },
+    {
+      "subsystem": "filemanagement",
+      "components": [
+        {
+          "component": "dfs_service",
+          "features": []
+        }
+      ]
+    }
+  ]
+}

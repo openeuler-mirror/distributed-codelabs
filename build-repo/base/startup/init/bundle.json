@@ -1,0 +1,78 @@
+{
+    "name": "@ohos/startup_init_lite",
+    "description": "ohos init process",
+    "homePage": "https://gitee.com/openharmony",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/startup_init_lite",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "base/startup/init"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "init",
+        "subsystem": "startup",
+        "syscap": [
+            "SystemCapability.Startup.SystemInfo"
+        ],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [
+                "startup",
+                "c_utils"
+            ],
+            "third_party": [
+                "cJSON",
+                "bounds_checking_function"
+            ]
+        },
+        "build": {
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                ],
+                "service_group": [
+                ]
+              },
+            "sub_component": [
+                "//base/startup/init/services/param_service:param_service"
+            ],
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base": "//base/startup/init/interfaces/innerkits/include/",
+                        "header_files": [
+                            "service_control.h",
+                            "beget_ext.h",
+                            "syspara/parameter.h",
+                            "syspara/parameters.h",
+                            "syspara/param_wrapper.h",
+                            "syspara/sysparam_errno.h"
+                        ]
+                    },
+                    "name": "//base/startup/init/interfaces/innerkits:libbegetutil"
+                },
+                {
+                    "header": {
+                        "header_base": "//base/startup/init/interfaces/innerkits/include/",
+                        "header_files": [
+                            "service_watcher.h",
+                            "syspara/parameter.h",
+                            "syspara/sysparam_errno.h"
+                        ]
+                    },
+                    "name": "//base/startup/init/interfaces/innerkits:libbeget_proxy"
+                }
+            ],
+            "test": [
+            ]
+        }
+    }
+}

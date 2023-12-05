@@ -1,0 +1,83 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/test.gni")
+
+module_output_path = "data_object/impl"
+
+###############################################################################
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "../../../../../frameworks/innerkitsimpl/include/adaptor",
+    "../../../../../frameworks/innerkitsimpl/include/common",
+    "../../../../../frameworks/innerkitsimpl/include/communicator",
+  ]
+}
+
+ohos_distributedtest("DistributedTest") {
+  module_out_path = module_output_path
+
+  configs = [ ":module_private_config" ]
+  sources = []
+  sources += [ "distributed_test.cpp" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "c_utils:utils",
+    "data_object:distributeddataobject_impl",
+    "dsoftbus:softbus_client",
+    "hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  deps = [
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_distributedtest("DistributedTestAgent") {
+  module_out_path = module_output_path
+  configs = [ ":module_private_config" ]
+  sources = [ "distributed_test_agent.cpp" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "c_utils:utils",
+    "data_object:distributeddataobject_impl",
+    "dsoftbus:softbus_client",
+    "hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  deps = [
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+###############################################################################
+group("distributedtest") {
+  testonly = true
+
+  deps = [
+    ":DistributedTest",
+    ":DistributedTestAgent",
+  ]
+}
+
+###############################################################################
+

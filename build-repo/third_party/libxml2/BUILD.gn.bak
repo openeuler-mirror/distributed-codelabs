@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+import("//build/ohos.gni")
+
+# This is the configuration needed to use libxml2.
+config("libxml2_config") {
+  include_dirs = [ "include" ]
+}
+
+# This is the configuration used to build libxml2 itself. It should not be needed outside of this
+# library.
+#
+# This has to be a config instead of flags directly specified on the libxml2 target so the -Wno-*
+# flags are ordered after the -Werror flags from the default configs.
+config("libxml2_private_config") {
+  visibility = [ ":*" ]
+  cflags = [
+    "-Wno-empty-body",
+    "-Wno-incompatible-pointer-types",
+    "-Wno-missing-field-initializers",
+    "-Wno-self-assign",
+    "-Wno-sign-compare",
+    "-Wno-tautological-pointer-compare",
+    "-Wno-unused-function",
+    "-Wno-enum-compare",
+  ]
+  defines = [
+    "HAVE_CONFIG_H",
+    "_REENTRANT",
+  ]
+  if (is_linux) {
+    defines += [ "_GNU_SOURCE" ]
+  }
+}
+
+group("libxml2") {
+  public_deps = [ ":xml2" ]
+}
+
+ohos_shared_library("xml2") {
+  include_dirs = [ "/usr/include/libxml2/libxml" ]
+  libs = [ "xml2" ]
+  part_name = "libxml2"
+  subsystem_name = "thirdparty"
+}
+
+config("libxml2_static_config") {
+  cflags = [
+    "-Wno-implicit-fallthrough",
+    "-Wno-implicit-function-declaration",
+    "-Wno-int-conversion",
+    "-Wno-uninitialized",
+    "-Wno-sometimes-uninitialized",
+  ]
+
+  include_dirs = []
+  if (is_mingw) {
+    defines = [ "LIBXML_STATIC" ]
+    include_dirs += [ get_label_info(":libxml2_generate_header",
+                                     "target_out_dir") + "/include" ]
+  } else if (is_mac) {
+    defines = [ "LIBXML_THREAD_ENABLED" ]
+  } else if (is_linux) {
+    include_dirs += [ get_label_info(":libxml2_generate_header",
+                                     "target_out_dir") + "/include" ]
+  }
+
+  include_dirs += [ "include" ]
+  cflags_cc = [ "-std=c++17" ]
+}
+
+ohos_static_library("static_libxml2") {
+  include_dirs = [ "/usr/include/libxml2/libxml" ]
+  libs = [ "xml2" ]
+  part_name = "libxml2"
+  subsystem_name = "thirdparty"
+}
+
+action("libxml2_generate_header") {
+  script = "generate_header.py"
+  inputs = [
+    "config.h.cmake.in",
+    "include/libxml/xmlversion.h.in",
+  ]
+
+  config_json_path = "config_linux.json"
+  xml_version_json_path = "xml_version.json"
+  if (is_mingw) {
+    config_json_path = "config_win.json"
+  }
+  inputs += [ config_json_path ]
+  inputs += [ xml_version_json_path ]
+
+  config_path = get_label_info(":libxml2_generate_header", "target_out_dir") +
+                "/include/config.h"
+  xmlversion_path =
+      get_label_info(":libxml2_generate_header", "target_out_dir") +
+      "/include/libxml/xmlversion.h"
+  outputs = [
+    config_path,
+    xmlversion_path,
+  ]
+
+  args = [
+    "--config-input-path",
+    rebase_path("config.h.cmake.in", root_build_dir),
+    "--config-path",
+    rebase_path(config_path, root_build_dir),
+    "--xmlversion-input-path",
+    rebase_path("include/libxml/xmlversion.h.in", root_build_dir),
+    "--xmlversion-path",
+    rebase_path(xmlversion_path, root_build_dir),
+    "--config-json",
+    rebase_path(config_json_path, root_build_dir),
+    "--xmlversion-json",
+    rebase_path(xml_version_json_path, root_build_dir),
+  ]
+}

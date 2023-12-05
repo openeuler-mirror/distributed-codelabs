@@ -1,0 +1,48 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+module_output_path = "dataclassification/datasecuritylevel"
+
+config("datatransmitmgr_test_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//base/security/dataclassification/test/unittest/datatransmitmgr",
+    "//base/security/dataclassification/interfaces/innerkits/datatransmitmgr/include",
+    "//base/startup/init/interfaces/innerkits/include/syspara",
+    "//third_party/googletest/googletest/include",
+    "//commonlibrary/c_utils/base/include",
+  ]
+  cflags = [ "-DHILOG_ENABLE" ]
+}
+
+ohos_unittest("DevSLMgrTest") {
+  part_name = "dataclassification"
+  subsystem_name = "security"
+  module_out_path = module_output_path
+
+  sources = [ "DevSLMgrTest.cpp" ]
+
+  deps = [
+    "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
+    "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//base/security/dataclassification/interfaces/innerkits/datatransmitmgr:data_transit_mgr",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "device_security_level:dslm_sdk",
+    "dsoftbus:softbus_client",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}

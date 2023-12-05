@@ -1,0 +1,222 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//foundation/communication/dsoftbus/dsoftbus.gni")
+import(
+    "//foundation/communication/dsoftbus/sdk/transmission/trans_channel/udp/trans_udp_sdk.gni")
+
+trans_sdk_test_common_src = [
+  "tcp_direct/unittest/trans_session_test.cpp",
+  "tcp_direct/unittest/trans_tcp_direct_test.cpp",
+  "udp/stream/trans_sdk_stream_test.cpp",
+  "tcp_direct/unittest/trans_sdk_tcp_direct_test.cpp",
+]
+
+trans_sdk_test_common_inc = [
+  "$dsoftbus_root_path/core/common/include",
+  "$dsoftbus_root_path/sdk/transmission/session/include",
+  "$dsoftbus_root_path/interfaces/inner_kits/transport",
+  "$dsoftbus_root_path/interfaces/kits/transport",
+  "$dsoftbus_root_path/tests/sdk/common/include",
+  "$dsoftbus_root_path/sdk/transmission/trans_channel/tcp_direct/src",
+  "$dsoftbus_root_path/adapter/common/include",
+  "$dsoftbus_root_path/sdk/transmission/trans_channel/tcp_direct/include",
+  "$dsoftbus_root_path/sdk/transmission/session/include",
+  "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/common/include",
+  "$dsoftbus_root_path/core/transmission/trans_channel/udp_negotiation/include",
+  "$dsoftbus_root_path/core/frame/common/include",
+  "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+  "$dsoftbus_root_path/sdk/transmission/ipc/include",
+]
+trans_sdk_test_common_deps = [
+  "$dsoftbus_root_path/core/common:softbus_utils",
+  "$dsoftbus_root_path/sdk:softbus_client",
+  "$dsoftbus_root_path/tests/sdk/common:softbus_access_token_test",
+]
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  import("//build/lite/config/test.gni")
+
+  if (ohos_build_type == "debug") {
+    unittest("TransSdkTest") {
+      output_extension = "bin"
+      output_dir = "$root_out_dir/test/unittest/dsoftbus"
+      sources = trans_sdk_test_common_src
+      include_dirs = trans_sdk_test_common_inc
+      include_dirs += [
+        "$dsoftbus_root_path/core/common/softbus_property/include",
+        "$softbus_adapter_config/spec_config",
+        "$dsoftbus_root_path/adapter/common/include/OS_adapter_define/linux",
+      ]
+      deps = trans_sdk_test_common_deps
+      deps += [
+        "$dsoftbus_root_path/adapter:softbus_adapter",
+        "$hilog_lite_deps_path",
+      ]
+    }
+  }
+} else {
+  import("//build/test.gni")
+
+  trans_sdk_proxy_test_src = [
+    "proxy/client_trans_proxy_file_common_test.cpp",
+    "udp/stream/trans_sdk_comm_stream_test.cpp",
+    "udp/common/client_trans_udp_manager_test.cpp",
+    "proxy/client_trans_pending_test.cpp",
+    "proxy/client_trans_proxy_manager_test.cpp",
+  ]
+
+  trans_sdk_proxy_test_inc = [
+    "$dsoftbus_root_path/sdk/transmission/trans_channel/proxy/include",
+    "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+  ]
+
+  trans_sdk_proxy_test_deps = [ "$dsoftbus_root_path/sdk:softbus_client" ]
+
+  module_output_path = "dsoftbus/transmission"
+  ohos_unittest("TransSdkTest") {
+    module_out_path = module_output_path
+    sources = trans_sdk_test_common_src
+    sources += trans_sdk_proxy_test_src
+    include_dirs = trans_sdk_test_common_inc
+    include_dirs += trans_sdk_proxy_test_inc
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+
+  module_output_path = "dsoftbus/transmission"
+  ohos_unittest("TransSdkUdpManagerTest") {
+    module_out_path = module_output_path
+    sources = [ "udp/common/client_trans_udp_manager_static_test.cpp" ]
+    include_dirs = trans_sdk_test_common_inc
+    include_dirs += [
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/common/src",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/stream/include",
+      "$dsoftbus_root_path/sdk/transmission/ipc/include",
+    ]
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+
+  module_output_path = "dsoftbus/transmission"
+  ohos_unittest("TransSdkProxyFileManagerTest") {
+    module_out_path = module_output_path
+    sources = [ "proxy/client_trans_proxy_file_manager_test.cpp" ]
+    include_dirs = trans_sdk_test_common_inc
+    include_dirs += [
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/proxy/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+      "$dsoftbus_root_path/sdk/transmission/ipc/include",
+      "$dsoftbus_root_path/sdk/bus_center/manager/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/proxy/src",
+      "$dsoftbus_root_path/sdk/transmission/session/src",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/manager/include",
+      "$dsoftbus_root_path/core/frame/common/include",
+      "$dsoftbus_root_path/core/transmission/common/include",
+    ]
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+
+  module_output_path = "dsoftbus/transmission"
+  ohos_unittest("TransSdkChannelManagerTest") {
+    module_out_path = module_output_path
+    sources = [
+      "manager/client_trans_channel_callback_test.cpp",
+      "manager/client_trans_channel_manager_test.cpp",
+      "manager/client_trans_session_impl_test.cpp",
+    ]
+    include_dirs = trans_sdk_test_common_inc
+    include_dirs += [
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/manager/include",
+      "$dsoftbus_root_path/sdk/transmission/session/cpp/src",
+      "$dsoftbus_root_path/sdk/transmission/session/cpp/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/auth/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/proxy/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/file/include",
+      "$dsoftbus_root_path/sdk/transmission/trans_channel/udp/common/include",
+    ]
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+
+  ohos_unittest("TransSdkUdpStreamInterfaceTest") {
+    module_out_path = module_output_path
+    sources = [ "udp/stream/client_trans_udp_stream_interface_test.cpp" ]
+    include_dirs = trans_udp_channel_sdk_inc
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+
+  ohos_unittest("TransSdkUdpStreamAdaptorTest") {
+    module_out_path = module_output_path
+    sources = [ "udp/stream/stream_adaptor_test.cpp" ]
+    include_dirs = trans_udp_channel_sdk_inc
+    deps = trans_sdk_test_common_deps
+    deps += trans_sdk_proxy_test_deps
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+  }
+  group("unittest") {
+    testonly = true
+    deps = [
+      ":TransSdkChannelManagerTest",
+      ":TransSdkProxyFileManagerTest",
+      ":TransSdkTest",
+      "monitor_permission_test:MonitorPermission",
+      "permission:DynamicPermissionTest",
+      "udp/stream/libsoftbus_stream:unittest",
+    ]
+    if (dsoftbus_feature_trans_udp == true) {
+      if (dsoftbus_feature_trans_udp_stream == true) {
+        if (!defined(ohos_lite)) {
+          deps += [
+            ":TransSdkUdpStreamAdaptorTest",
+            ":TransSdkUdpStreamInterfaceTest",
+          ]
+        }
+      }
+    }
+  }
+}

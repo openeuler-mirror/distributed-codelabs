@@ -1,0 +1,13 @@
+config("openeuler_config") {
+  cflags = [
+    "-Wno-error",
+    "-Wno-error=implicit-fallthrough",
+    "-Wno-error=unused-command-line-argument",
+  ]
+}
+
+config("openeuler_include_dirs") {
+  include_dirs = [
+    "//build/openeuler/compiler_include",
+  ]
+}

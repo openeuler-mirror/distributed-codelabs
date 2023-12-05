@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Copyright (c) 2022 Huawei Device Co., Ltd.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<configuration ver="2.0">
+    <target name="ParseUtilTest">
+        <preparer>
+            <option name="push" value="profile/profile.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/profile_audio.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/invalid_root.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/test_trust_muti_sa.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/invalid_root_trust.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/invalid_element_trust.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/test_trust_one_sa.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/invalid_muti_root_trust.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/multi_sa_profile.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/test_trust_not_all_allow.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/test_trust_all_allow.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/no_xml_file -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/mock.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/empty_process.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/empty_systemability.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="profile/empty_libpath.xml -> /data/test/resource/samgr/profile/" src="res"/>
+            <option name="push" value="systemabilitymgr/samgr/libmock_sa.z.so -> /data/test/" src="out"/>
+        </preparer>
+    </target>
+</configuration>

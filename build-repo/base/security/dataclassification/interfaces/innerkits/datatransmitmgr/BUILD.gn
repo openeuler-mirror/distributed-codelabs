@@ -1,0 +1,44 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+################################################################
+# C, Main source file here.
+################################################################
+config("datatransmitmgr_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("data_transit_mgr") {
+  subsystem_name = "security"
+  part_name = "dataclassification"
+
+  public_configs = [ ":datatransmitmgr_config" ]
+
+  include_dirs = [ "include" ]
+
+  sources = [
+    "//base/security/dataclassification/frameworks/datatransmitmgr/dev_slinfo_adpt.c",
+    "//base/security/dataclassification/frameworks/datatransmitmgr/dev_slinfo_list.c",
+    "//base/security/dataclassification/frameworks/datatransmitmgr/dev_slinfo_mgr.c",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_security_level:dslm_sdk",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  cflags = [ "-Wall" ]
+}

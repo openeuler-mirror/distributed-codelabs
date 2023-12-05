@@ -1,0 +1,19 @@
+import("//build/ohos.gni")
+config("mbedtls_config") {
+  include_dirs = [
+    "include",
+ ]
+  libs = [ 
+   "mbedtls", 
+   "mbedcrypto",
+  ]
+}
+
+ohos_shared_library("mbedtls_shared") {
+  public_configs = [ ":mbedtls_config" ]
+}
+
+group("mbedtls") {
+  public_deps = [ ":mbedtls_shared" ]
+}
+

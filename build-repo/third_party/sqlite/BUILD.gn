@@ -1,0 +1,180 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+# Lets callers do '#include <sqlite3.h>'
+config("sqlite_config") {
+  include_dirs = [
+    "include",
+    "//commonlibrary/c_utils/base/include",
+  ]
+  cflags_c = [ "-Wno-unused-but-set-variable" ]
+}
+
+# This is the configuration used to build sqlite itself.
+# It should not be needed outside of this library.
+config("sqlite3_private_config") {
+  visibility = [ ":*" ]
+  include_dirs = [ "include" ]
+}
+
+group("libsqlite") {
+  public_deps = [ ":sqlite" ]
+}
+
+ohos_shared_library("sqlite") {
+  visibility = [ "//foundation/distributeddatamgr/*" ]
+  visibility += [ "//foundation/multimodalinput/*" ]
+  visibility +=
+      [ "//hit/fuzzing_test/projects/multimodal_InputService_fuzzer/*" ]
+  visibility += [ "//foundation/communication/*" ]
+  visibility += [ "//build/common/*" ]
+  visibility += [ ":*" ]
+  visibility += [ "//base/security/permission/*" ]
+  visibility += [ "//third_party/libsoup/*" ]
+  visibility += [ "//base/security/access_token/*" ]
+  visibility += [ "//foundation/resourceschedule/resource_schedule_service/*" ]
+  visibility += [ "//base/update/dupdate_engine/services/engine/*" ]
+
+  sources = [ "src/sqlite3.c" ]
+
+  defines = [
+    "NDEBUG=1",
+    "HAVE_USLEEP=1",
+    "SQLITE_HAVE_ISNAN",
+    "SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576",
+    "SQLITE_THREADSAFE=2",
+    "SQLITE_TEMP_STORE=3",
+    "SQLITE_POWERSAFE_OVERWRITE=1",
+    "SQLITE_DEFAULT_FILE_FORMAT=4",
+    "SQLITE_DEFAULT_AUTOVACUUM=1",
+    "SQLITE_ENABLE_MEMORY_MANAGEMENT=1",
+    "SQLITE_ENABLE_FTS3",
+    "SQLITE_ENABLE_FTS4",
+    "SQLITE_ENABLE_FTS5",
+    "SQLITE_OMIT_COMPILEOPTION_DIAGS",
+    "SQLITE_OMIT_LOAD_EXTENSION",
+    "SQLITE_DEFAULT_FILE_PERMISSIONS=0660",
+    "SQLITE_SECURE_DELETE",
+    "SQLITE_ENABLE_BATCH_ATOMIC_WRITE",
+    "USE_PREAD64",
+    "fdatasync=fdatasync",
+    "HAVE_MALLOC_H=1",
+    "HAVE_MALLOC_USABLE_SIZE",
+    "SQLITE_DIRECT_OVERFLOW_READ",
+    "SQLITE_HAS_CODEC",
+    "SQLITE_EXPORT_SYMBOLS",
+    "SQLITE_SHARED_BLOCK_OPTIMIZATION",
+    "SQLITE_CODEC_ATTACH_CHANGED",
+  ]
+  cflags_c = [
+    "-fvisibility=hidden",
+    "-Wno-implicit-fallthrough",
+  ]
+  ldflags = [ "-Wl,--exclude-libs,ALL" ]
+  deps = [ "//third_party/openssl:libcrypto_shared" ]
+  public_configs = [ ":sqlite_config" ]
+  configs = [ ":sqlite3_private_config" ]
+  part_name = "common"
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  external_deps = [ "c_utils:utils" ]
+}
+
+ohos_executable("sqlite3") {
+  include_dirs = [ "include" ]
+  sources = [
+    "src/shell.c",
+    "src/sqlite3.c",
+  ]
+
+  defines = [
+    "NDEBUG=1",
+    "HAVE_USLEEP=1",
+    "SQLITE_HAVE_ISNAN",
+    "SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576",
+    "SQLITE_THREADSAFE=2",
+    "SQLITE_TEMP_STORE=3",
+    "SQLITE_POWERSAFE_OVERWRITE=1",
+    "SQLITE_DEFAULT_FILE_FORMAT=4",
+    "SQLITE_DEFAULT_AUTOVACUUM=1",
+    "SQLITE_ENABLE_MEMORY_MANAGEMENT=1",
+    "SQLITE_ENABLE_FTS3",
+    "SQLITE_ENABLE_FTS4",
+    "SQLITE_OMIT_COMPILEOPTION_DIAGS",
+    "SQLITE_OMIT_LOAD_EXTENSION",
+    "SQLITE_DEFAULT_FILE_PERMISSIONS=0600",
+    "SQLITE_SECURE_DELETE",
+    "SQLITE_ENABLE_BATCH_ATOMIC_WRITE",
+    "USE_PREAD64",
+    "fdatasync=fdatasync",
+    "SQLITE_DIRECT_OVERFLOW_READ",
+    "SQLITE_SHARED_BLOCK_OPTIMIZATION",
+  ]
+
+  cflags = [
+    "-Wno-error=implicit-function-declaration",
+    "-Wno-implicit-fallthrough",
+  ]
+}
+
+if (is_mingw || is_mac) {
+  ohos_shared_library("sqlite_sdk") {
+    include_dirs = [
+      "include",
+      "//third_party/bounds_checking_function/include",
+      "//third_party/openssl/include",
+    ]
+
+    sources = [ "src/sqlite3.c" ]
+
+    defines = [
+      "NDEBUG=1",
+      "HAVE_USLEEP=1",
+      "SQLITE_HAVE_ISNAN",
+      "SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576",
+      "SQLITE_THREADSAFE=2",
+      "SQLITE_TEMP_STORE=3",
+      "SQLITE_POWERSAFE_OVERWRITE=1",
+      "SQLITE_DEFAULT_FILE_FORMAT=4",
+      "SQLITE_DEFAULT_AUTOVACUUM=1",
+      "SQLITE_ENABLE_MEMORY_MANAGEMENT=1",
+      "SQLITE_ENABLE_FTS3",
+      "SQLITE_ENABLE_FTS4",
+      "SQLITE_OMIT_COMPILEOPTION_DIAGS",
+      "SQLITE_OMIT_LOAD_EXTENSION",
+      "SQLITE_DEFAULT_FILE_PERMISSIONS=0600",
+      "SQLITE_SECURE_DELETE",
+      "SQLITE_ENABLE_BATCH_ATOMIC_WRITE",
+      "USE_PREAD64",
+      "fdatasync=fdatasync",
+      "SQLITE_DIRECT_OVERFLOW_READ",
+      "SQLITE_HAS_CODEC",
+      "SQLITE_EXPORT_SYMBOLS",
+      "SQLITE_SHARED_BLOCK_OPTIMIZATION",
+    ]
+    remove_configs = [ "//build/config/compiler:chromium_code" ]
+    deps = [
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/openssl:libcrypto_restool",
+    ]
+    if (is_mingw) {
+      libs = [ "//prebuilts/mingw-w64/ohos/linux-x86_64/clang-mingw/x86_64-w64-mingw32/lib/libws2_32.a" ]
+    }
+    cflags = [
+      "-Wno-error=implicit-function-declaration",
+      "-Wno-implicit-fallthrough",
+    ]
+  }
+}

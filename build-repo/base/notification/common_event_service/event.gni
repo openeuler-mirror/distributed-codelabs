@@ -1,0 +1,61 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ability_runtime_path = "//foundation/ability/ability_runtime"
+
+ability_runtime_inner_api_path = "${ability_runtime_path}/interfaces/inner_api"
+
+ability_runtime_services_path = "${ability_runtime_path}/services"
+
+ability_runtime_napi_path = "${ability_runtime_path}/frameworks/js/napi"
+
+ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
+
+common_event_service_path = "//base/notification/common_event_service"
+
+frameworks_path = "${common_event_service_path}/frameworks"
+
+interfaces_path = "${common_event_service_path}/interfaces"
+
+services_path = "${common_event_service_path}/services"
+
+tools_path = "${common_event_service_path}/tools"
+
+ces_common_path = "${frameworks_path}/common"
+
+ces_core_path = "${frameworks_path}/core"
+
+ces_innerkits_path = "${interfaces_path}/inner_api"
+
+ces_native_path = "${frameworks_path}/native"
+
+ces_services_path = "${services_path}"
+declare_args() {
+  common_event_service_with_graphics = true
+  has_hisysevent_part = false
+  common_event_service_tool_cem_enable = true
+
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.account_os_account)) {
+    has_os_account_part = true
+  } else {
+    has_os_account_part = false
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_hisysevent_native)) {
+    has_hisysevent_part = false
+  }
+
+  print("has_hisysevent_part = " + "$has_hisysevent_part")
+}

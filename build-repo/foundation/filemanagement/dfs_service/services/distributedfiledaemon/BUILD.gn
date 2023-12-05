@@ -1,0 +1,63 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//foundation/filemanagement/dfs_service/distributedfile.gni")
+
+ohos_shared_library("libdistributedfiledaemon") {
+  include_dirs = [
+    "include",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    "//base/security/device_auth/interfaces/innerkits",
+    "//third_party/json/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include",
+  ]
+
+  sources = [
+    "src/device/device_info.cpp",
+    "src/device/device_manager_agent.cpp",
+    "src/ipc/daemon.cpp",
+    "src/ipc/daemon_stub.cpp",
+    "src/mountpoint/mount_manager.cpp",
+    "src/mountpoint/mount_point.cpp",
+    "src/multiuser/os_account_observer.cpp",
+    "src/network/devsl_dispatcher.cpp",
+    "src/network/kernel_talker.cpp",
+    "src/network/network_agent_template.cpp",
+    "src/network/session_pool.cpp",
+    "src/network/softbus/softbus_agent.cpp",
+    "src/network/softbus/softbus_session.cpp",
+    "src/network/softbus/softbus_session_dispatcher.cpp",
+  ]
+
+  deps = [
+    "//third_party/bounds_checking_function:libsec_shared",
+    "${utils_path}:libdistributedfileutils",
+    "//base/security/device_auth/services:deviceauth_sdk",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+  ]
+  external_deps = [
+    # "common_event_service:cesfwk_innerkits",
+    "dataclassification:data_transit_mgr",
+    "dsoftbus:softbus_client",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+  ]
+  configs = [ "${utils_path}:compiler_configs" ]
+
+  defines = [ "LOG_TAG=\"distributedfile_daemon\"" ]
+
+  part_name = "dfs_service"
+  subsystem_name = "filemanagement"
+}

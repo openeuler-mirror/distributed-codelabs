@@ -1,0 +1,51 @@
+{
+    "name": "@ohos/dfs_service",
+    "version": "3.1",
+    "description": "The dfs_service module belongs to the filemanagement subsystem of OpenHarmony. It provides the ability of accessing distributed files.",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/filemanagement/dfs_service"
+    },
+    "dirs": {},
+    "scripts": {},
+    "author": {},
+    "repository": "",
+    "component": {
+      "name": "dfs_service",
+      "subsystem": "filemanagement",
+      "syscap": [],
+      "features": [],
+      "adapted_system_type": [],
+      "rom": "",
+      "ram": "",
+      "deps": {
+        "components": [
+          "ability_base",
+          "bundle_framework",
+          "dataclassification",
+          "dsoftbus",
+          "ipc",
+          "hilog",
+          "safwk",
+          "samgr",
+          "utils"
+        ],
+        "third_party": [ 
+          "json_modern_c++"
+        ]
+      },
+      "build": {
+        "group_type": {
+          "base_group": [],
+          "fwk_group": [],
+          "service_group": [
+            "//foundation/filemanagement/dfs_service:services_target"
+          ]
+        },
+        "test": [ 
+          "//foundation/filemanagement/dfs_service:dfs_test_moudule"
+        ]
+      }
+    }
+}

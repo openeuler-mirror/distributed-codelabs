@@ -1,0 +1,77 @@
+{
+    "name": "@ohos/eventhandler",
+    "description": "事件处理服务",
+    "version": "3.1",
+    "license": "Apache 2.0",
+    "segment": {
+        "destPath": "base/notification/eventhandler/frameworks/eventhandler"
+    },
+    "component": {
+        "name": "eventhandler",
+        "subsystem": "notification",
+        "syscap": [
+            "SystemCapability.Notification.Emitter"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "500KB",
+        "ram": "1000KB",
+        "deps": {
+            "components": [
+                "hitrace_native",
+                "hiviewdfx_hilog_native",
+                "hichecker_native"
+            ],
+            "third_party": []
+        },
+        "build": {
+            "group_type": {
+                "base_group": [
+
+                ],
+                "fwk_group": [
+                    "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
+                    "//base/notification/eventhandler/frameworks:eventhandler_native_target",
+                    "//base/notification/eventhandler/frameworks:napi_packages"
+                ],
+                "service_group": [
+
+                ]
+            },
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base": "//base/notification/eventhandler/interfaces/inner_api",
+                        "header_files": [
+                            "event_handler_errors.h",
+                            "event_handler.h",
+                            "event_queue.h",
+                            "event_runner.h",
+                            "inner_event.h",
+                            "file_descriptor_listener.h",
+                            "native_implement_eventhandler.h"
+                        ]
+                    },
+                    "name": "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler"
+                },
+                {
+                    "header": {
+                        "header_base": "//base/notification/eventhandler/interfaces/kits/native",
+                        "header_files": [
+                            "native_interface_eventhandler.h"
+                        ]
+                    },
+                    "name": "//base/notification/eventhandler/frameworks/native:eventhandler_native"
+                }
+            ],
+            "test": [
+                "//base/notification/eventhandler/frameworks/eventhandler/test:unittest",
+                "//base/notification/eventhandler/frameworks/test/moduletest:moduletest",
+                "//base/notification/eventhandler/test/fuzztest:fuzztest",
+                "//base/notification/eventhandler/test/systemtest:systemtest"
+            ]
+        }
+    }
+}

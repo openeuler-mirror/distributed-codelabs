@@ -1,0 +1,74 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("hitrace_osal_inner_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "./include",
+    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
+  ]
+}
+
+ohos_static_library("hitrace_osal_inner") {
+  sources = [ "./src/hitrace_osal.cpp" ]
+  public_configs = [ ":hitrace_osal_inner_config" ]
+  external_deps = [ "init:libbegetutil" ]
+
+  subsystem_name = "hiviewdfx"
+  part_name = "hitrace_native"
+}
+
+ohos_executable("hitrace") {
+  install_enable = true
+  sources = [ "./src/hitrace_cmd.cpp" ]
+
+  deps = [
+    ":hitrace_osal_inner",
+    "//third_party/zlib:libz",
+  ]
+
+  external_deps = [ "c_utils:utils" ]
+
+  include_dirs = [
+    "./include",
+    "//commonlibrary/c_utils/base/include",
+    "//third_party/zlib",
+  ]
+  subsystem_name = "hiviewdfx"
+  part_name = "hitrace_native"
+}
+
+ohos_prebuilt_etc("hitrace.cfg") {
+  source = "./config/hitrace.cfg"
+  relative_install_dir = "init"
+  subsystem_name = "hiviewdfx"
+  part_name = "hitrace_native"
+}
+
+ohos_executable("hitrace_example") {
+  sources = [ "example/hitrace_example.cpp" ]
+
+  external_deps = [ "hitrace_native:hitrace_meter" ]
+  install_enable = false
+  subsystem_name = "hiviewdfx"
+  part_name = "hitrace_native"
+}
+
+group("hitrace_target") {
+  deps = [
+    ":hitrace",
+    ":hitrace_example",
+  ]
+}
