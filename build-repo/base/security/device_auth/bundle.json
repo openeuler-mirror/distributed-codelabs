@@ -1,0 +1,76 @@
+{
+    "name": "@ohos/deviceauth",
+    "version": "3.1",
+    "description": "The device authentication module belongs to the security subsystem of OpenHarmony. It manages the entire lifecycle of trust relationships between devices.",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "base/security/device_auth"
+    },
+    "dirs": {},
+    "scripts": {},
+    "author": {},
+    "repository": "",
+    "license": "Apache License 2.0",
+    "component": {
+      "name": "device_auth",
+      "subsystem": "security",
+      "syscap": [ "SystemCapability.Security.DeviceAuth" ],
+      "features": [],
+      "hisysevent_config": [
+          "//base/security/device_auth/hisysevent.yaml"
+      ],
+      "adapted_system_type": [
+          "standard",
+          "small",
+          "mini"
+        ],
+      "rom": "500KB",
+      "ram": "500KB",
+      "deps": {
+        "components": [
+          "dsoftbus",
+          "safwk",
+          "os_account",
+          "access_token",
+          "security",
+          "common",
+          "utils_base",
+          "hiviewdfx_hilog_native",
+          "hisysevent_native",
+          "samgr",
+          "ipc"
+        ],
+        "third_party": [
+          "cJSON",
+          "bounds_checking_function",
+          "mbedtls",
+          "openssl"
+        ]
+      },
+      "build": {
+        "sub_component": [
+          "//base/security/device_auth:deviceauth_sdk_build",
+          "//base/security/device_auth:deviceauth_service_build",
+          "//base/security/device_auth:deviceauth_build",
+          "//base/security/device_auth/frameworks/deviceauth_lite:hichainsdk"
+        ],
+        "inner_kits": [
+          {
+            "name": "//base/security/device_auth/services:deviceauth_sdk",
+            "header": {
+              "header_files": [
+                "device_auth_defines.h",
+                "device_auth.h"
+              ],
+              "header_base": "//base/security/device_auth/interfaces/innerkits"
+            }
+          }
+        ],
+        "test": [
+            "//base/security/device_auth:deviceauth_test_build",
+            "//base/security/device_auth:key_agree_sdk_test_build",
+            "//base/security/device_auth/frameworks/deviceauth_lite:deviceauth_lite_test_build"
+        ]
+      }
+    }
+}

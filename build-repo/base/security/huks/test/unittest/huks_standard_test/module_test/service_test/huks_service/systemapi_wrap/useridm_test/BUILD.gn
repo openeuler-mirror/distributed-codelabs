@@ -1,0 +1,49 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/security/huks/huks.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "huks_standard/huks_systemapi_wrap"
+
+ohos_unittest("huks_useridm_wrap_test") {
+  module_out_path = module_output_path
+
+  sources = [ "src/hks_useridm_api_wrap_test.cpp" ]
+
+  defines = [
+    # "L2_STANDARD",
+    "_HUKS_LOG_ENABLE_",
+  ]
+  configs = [ "//base/security/huks/frameworks/config/build:coverage_flag" ]
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//base/security/huks/frameworks/huks_standard/main/common/include/",
+    "include",
+    "//base/security/huks/services/huks_standard/huks_service/main/systemapi_wrap/useridm/inc",
+    "//base/security/huks/test/unittest/huks_standard_test/module_test/service_test/huks_service/systemapi_wrap/useridm_test/user_iam_api_mock",
+  ]
+
+  sources += [
+    "//base/security/huks/services/huks_standard/huks_service/main/systemapi_wrap/useridm/src/hks_useridm_api_wrap.cpp",
+    "//base/security/huks/test/unittest/huks_standard_test/module_test/service_test/huks_service/systemapi_wrap/useridm_test/user_iam_api_mock/user_idm_client.cpp",
+  ]
+
+  deps = [
+    "//base/security/huks/interfaces/innerkits/huks_standard/main:libhukssdk",
+    "//base/security/huks/utils/condition:libhuks_utils_condition_static",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}

@@ -37,6 +37,5 @@
 *node_modules
 *.hvigor
 *.cxx
-*build
 *.clang*
 *.preview

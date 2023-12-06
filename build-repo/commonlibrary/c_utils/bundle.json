@@ -1,0 +1,107 @@
+{
+  "name": "@openharmony/c_utils",
+  "version": "3.1.0",
+  "description": "c_utils",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "commonlibrary/c_utils"
+  },
+  "scripts": {
+    "install": "DEST_PATH=${DEP_BUNDLE_BASE}/commonlibrary/c_utils/base && mkdir -p $DEST_PATH && cp -r ./* $DEST_PATH"
+  },
+  "author": {},
+  "repository": "",
+  "license": "Apache License 2.0",
+  "component": {
+    "name": "c_utils",
+    "subsystem": "commonlibrary",
+    "adapted_system_type": [ "standard" ],
+    "deps": {
+      "components": [
+        "hilog_native"
+      ],
+      "third_party": []
+    },
+    "build": {
+      "sub_component": [
+        "//commonlibrary/c_utils/base:utils",
+        "//commonlibrary/c_utils/base:utilsbase"
+      ],
+      "inner_kits": [
+        {
+          "name": "//commonlibrary/c_utils/base:utils",
+          "header": {
+            "header_files": [
+              "ashmem.h",
+              "common_errors.h",
+              "common_timer_errors.h",
+              "datetime_ex.h",
+              "directory_ex.h",
+              "errors.h",
+              "file_ex.h",
+              "flat_obj.h",
+              "nocopyable.h",
+              "observer.h",
+              "parcel.h",
+              "pubdef.h",
+              "refbase.h",
+              "rwlock.h",
+              "safe_block_queue.h",
+              "safe_map.h",
+              "safe_queue.h",
+              "securec.h",
+              "securectype.h",
+              "semaphore_ex.h",
+              "singleton.h",
+              "sorted_vector.h",
+              "string_ex.h",
+              "thread_ex.h",
+              "thread_pool.h",
+              "timer.h",
+              "unique_fd.h"
+            ],
+            "header_base": "//commonlibrary/c_utils/base/include"
+          }
+        },
+        {
+          "name": "//commonlibrary/c_utils/base:utilsbase",
+          "header": {
+            "header_files": [
+              "ashmem.h",
+              "common_errors.h",
+              "common_timer_errors.h",
+              "datetime_ex.h",
+              "directory_ex.h",
+              "errors.h",
+              "file_ex.h",
+              "flat_obj.h",
+              "nocopyable.h",
+              "observer.h",
+              "parcel.h",
+              "pubdef.h",
+              "refbase.h",
+              "rwlock.h",
+              "safe_block_queue.h",
+              "safe_map.h",
+              "safe_queue.h",
+              "securec.h",
+              "securectype.h",
+              "semaphore_ex.h",
+              "singleton.h",
+              "sorted_vector.h",
+              "string_ex.h",
+              "thread_ex.h",
+              "thread_pool.h",
+              "timer.h",
+              "unique_fd.h"
+            ],
+            "header_base": "//commonlibrary/c_utils/base/include"
+          }
+        }
+      ],
+      "test": [
+        "//commonlibrary/c_utils/base/test:unittest"
+      ]
+    }
+  }
+}

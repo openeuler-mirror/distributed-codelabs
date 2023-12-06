@@ -1,0 +1,91 @@
+{
+    "name": "@ohos/systemabilitymgr_samgr",
+    "description": "system ability manager",
+    "homePage": "https://gitee.com/openharmony",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/systemabilitymgr_samgr",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/systemabilitymgr/samgr"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "samgr",
+        "subsystem": "systemabilitymgr",
+        "features": [ "samgr_feature_coverage = false" ],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "hisysevent_config": [
+            "//foundation/systemabilitymgr/samgr/hisysevent.yaml"
+            ],
+        "rom": "300KB",
+        "ram": "7130KB",
+        "deps": {
+            "components": [
+                "access_token",
+                "c_utils",
+                "eventhandler",
+                "hisysevent_native",
+                "hitrace_native",
+                "hiviewdfx_hilog_native",
+                "init",
+                "ipc",
+                "samgr",
+                "selinux",
+                "startup_l2"
+            ],
+            "third_party": [ "libxml2" ]
+        },
+        "build": {
+            "group_type": {
+                "base_group": [],
+                "fwk_group": [
+                    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common",
+                    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                ],
+                "service_group": [
+                    "//foundation/systemabilitymgr/samgr/etc:samgr_etc",
+                    "//foundation/systemabilitymgr/samgr/services/samgr/native:samgr",
+                    "//third_party/libxml2:libxml2"
+                ]
+            },
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include/",
+                        "header_files": [
+                            "if_system_ability_manager.h",
+                            "iservice_registry.h",
+                            "isystem_ability_load_callback.h",
+                            "isystem_ability_status_change.h",
+                            "system_ability_definition.h",
+                            "system_ability_manager_proxy.h",
+                            "system_ability_load_callback_stub.h",
+                            "system_ability_status_change_stub.h",
+                            "sam_log.h"
+                        ]
+                    },
+                    "name": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy"
+                },
+                {
+                    "header": {
+                        "header_base": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include/",
+                        "header_files": [
+                            "sa_profiles.h",
+                            "parse_util.h"
+                        ]
+                    },
+                    "name": "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common"
+                }
+            ],
+            "test": [
+                "//foundation/systemabilitymgr/samgr/services/samgr/native/test:unittest",
+                "//foundation/systemabilitymgr/samgr/test/fuzztest/systemabilitymanager_fuzzer:fuzztest",
+                "//foundation/systemabilitymgr/samgr/services/common/test:unittest"
+            ]
+        }
+    }
+}

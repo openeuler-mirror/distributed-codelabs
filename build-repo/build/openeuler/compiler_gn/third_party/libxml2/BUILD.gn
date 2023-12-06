@@ -1,0 +1,11 @@
+import("//build/ohos.gni")
+import("//build/config/sysroot.gni")
+config("libxml2_private_config") {
+  include_dirs = [ "${sysroot}/usr/include/libxml2" ]
+  libs = [ "xml2" ]
+}
+
+ohos_shared_library("libxml2") {
+  public_configs = [ ":libxml2_private_config" ]
+}
+

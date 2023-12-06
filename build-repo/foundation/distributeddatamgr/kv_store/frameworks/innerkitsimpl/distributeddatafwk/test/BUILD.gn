@@ -1,0 +1,361 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/test.gni")
+# import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+module_output_path = "kv_store/distributeddatafwk"
+
+###############################################################################
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "../include/",
+    "../src/",
+    "../../kvdb/include/",
+    "../../kvdb/src/",
+    "../../object/include",
+    "../../rdb/include",
+    "../../rdb/src",
+    "../../../common/",
+    "../../../../interfaces/innerkits/distributeddata/include/",
+    # "${datashare_innerapi_path}/common/include",
+    # "${datashare_innerapi_path}/provider/include",
+
+    # TEMP MODIFICATION FOR PMS
+    "../../../../services/distributeddataservice/app/include",
+
+    # for ipc_core interfaces.
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include",
+    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/provider/include",
+    "//foundation/distributeddatamgr/distributedfile/interfaces/kits/js/src/mod_securitylabel",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include",
+  ]
+}
+
+###############################################################################
+ohos_source_set("distributeddatafwk_src_file") {
+  testonly = true
+
+  old_sources = [
+    "../src/blob.cpp",
+    "../src/change_notification.cpp",
+    "../src/data_query.cpp",
+    "../src/device_status_change_listener_client.cpp",
+    "../src/distributed_kv_data_manager.cpp",
+    "../src/ikvstore_client_death_observer.cpp",
+    "../src/ikvstore_data_service.cpp",
+    "../src/ikvstore_observer.cpp",
+    "../src/ikvstore_sync_callback.cpp",
+    "../src/itypes_util.cpp",
+    # "../src/kv_utils.cpp",
+    "../src/kvstore_client_death_observer.cpp",
+    # "../src/kvstore_datashare_bridge.cpp",
+    "../src/kvstore_observer_client.cpp",
+    "../src/kvstore_service_death_notifier.cpp",
+    "../src/kvstore_sync_callback_client.cpp",
+    "../src/sync_observer.cpp",
+  ]
+
+  rdb_sources = [
+    "../../rdb/src/rdb_manager.cpp",
+    "../../rdb/src/rdb_manager_impl.cpp",
+    "../../rdb/src/rdb_notifier.cpp",
+    "../../rdb/src/rdb_service_proxy.cpp",
+  ]
+  
+  kvdb_sources = [
+    "../../kvdb/src/auto_sync_timer.cpp",
+    "../../kvdb/src/backup_manager.cpp",
+    "../../kvdb/src/convertor.cpp",
+    "../../kvdb/src/dev_manager.cpp",
+    "../../kvdb/src/device_convertor.cpp",
+    "../../kvdb/src/kvdb_service_client.cpp",
+    "../../kvdb/src/observer_bridge.cpp",
+    "../../kvdb/src/security_manager.cpp",
+    "../../kvdb/src/single_store_impl.cpp",
+    "../../kvdb/src/store_factory.cpp",
+    "../../kvdb/src/store_manager.cpp",
+    "../../kvdb/src/store_result_set.cpp",
+    "../../kvdb/src/store_util.cpp",
+    "../../kvdb/src/system_api.cpp",
+    "../../kvdb/src/task_executor.cpp",
+  ]
+
+  sources = old_sources + rdb_sources + kvdb_sources
+  configs = [ ":module_private_config" ]
+  cflags_cc = [ "-Wno-c99-designator" ]
+
+  deps = [
+    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb:distributeddb",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "huks:libhukssdk",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  part_name = "kv_store"
+}
+
+ohos_unittest("DistributedKvDataManagerTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/distributed_kv_data_manager_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("DistributedKvDataManagerEncryptTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/distributed_kv_data_manager_encrypt_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("LocalSubscribeStoreTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/local_subscribe_store_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("LocalSubscribeDeviceStoreTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/local_subscribe_device_store_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("SingleKvStoreClientQueryTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/single_kvstore_client_query_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("SingleKvStoreClientTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/single_kvstore_client_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("DeviceKvStoreTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/device_kvstore_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+ohos_unittest("BlobTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/blob_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("TypesUtilTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/types_util_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("KvUtilTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/kv_utils_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("KvstoreDatashareBridgeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unittest/kvstore_datashare_bridge_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    ":distributeddatafwk_src_file",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
+}
+
+###############################################################################
+group("unittest") {
+  testonly = true
+
+  deps = []
+
+  deps += [
+    ":BlobTest",
+    ":DeviceKvStoreTest",
+    ":DistributedKvDataManagerEncryptTest",
+    ":DistributedKvDataManagerTest",
+    ":KvstoreDatashareBridgeTest",
+    ":KvUtilTest",
+    ":LocalSubscribeDeviceStoreTest",
+    ":LocalSubscribeStoreTest",
+    ":SingleKvStoreClientQueryTest",
+    ":SingleKvStoreClientTest",
+    ":TypesUtilTest",
+  ]
+}

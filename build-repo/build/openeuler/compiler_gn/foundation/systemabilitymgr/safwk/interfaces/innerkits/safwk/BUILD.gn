@@ -1,0 +1,41 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+
+# 建立所需头文件链接
+exec_script("//build/openeuler/script/link.py", [ "--src_target", "/usr/include/safwk/system_ability.h", "--dest_target", 
+            rebase_path("//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk/system_ability.h") ], "string")
+
+exec_script("//build/openeuler/script/link.py", [ "--src_target", "/usr/include/safwk", "--dest_target", 
+            rebase_path("//foundation/systemabilitymgr/safwk/services/safwk/include") ], "string")
+
+config("system_ability_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "../../../services/safwk/include",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
+  ]
+}
+
+ohos_prebuilt_shared_library("system_ability_fwk") {
+  source = "/usr/lib64/libsystem_ability_fwk.z.so"
+
+  public_configs = [ ":system_ability_config" ]
+
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  part_name = "safwk"
+  subsystem_name = "systemabilitymgr"
+}

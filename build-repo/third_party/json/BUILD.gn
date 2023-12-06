@@ -1,0 +1,13 @@
+import("//build/ohos.gni")
+
+config("nlohmann_json_config") {
+  include_dirs = [
+    "single_include/",
+    "single_include/nlohmann",
+  ]
+}
+
+ohos_static_library("nlohmann_json_static") {
+  public_configs = [ ":nlohmann_json_config" ]
+  subsystem_name = "multimodalinput"
+}

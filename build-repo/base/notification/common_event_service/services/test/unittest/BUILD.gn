@@ -1,0 +1,554 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/notification/common_event_service/event.gni")
+import("//build/test.gni")
+
+module_output_path = "common_event_service/services"
+
+config("cesfwk_services_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "${common_event_service_path}/test/mock/include",
+    "${services_path}/include",
+  ]
+
+  cflags = []
+
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
+ohos_unittest("common_event_publish_system_event_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_publish_system_event_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_dump_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_dump_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_freeze_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_freeze_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_freeze_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_freeze_unit_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("ability_manager_death_recipient_unit_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${ces_innerkits_path}",
+    "${services_path}/include",
+    "ability_manager_death_recipient_unit_test",
+  ]
+
+  sources = [
+    "${services_path}/src/ability_manager_death_recipient.cpp",
+    "ability_manager_death_recipient_unit_test/ability_manager_death_recipient_unit_test.cpp",
+    "mock/mock_ability_manager_helper.cpp",
+  ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_native_path}:cesfwk_innerkits",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("bundle_manager_death_recipient_unit_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${ces_innerkits_path}",
+    "${services_path}/include",
+  ]
+
+  sources = [
+    "${services_path}/src/bms_death_recipient.cpp",
+    "bundle_manager_death_recipient_unit_test/bundle_manager_death_recipient_unit_test.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
+  ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_native_path}:cesfwk_innerkits",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("static_subscriber_manager_unit_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${ces_innerkits_path}",
+    "${services_path}/include",
+    "//third_party/json/include",
+  ]
+
+  sources = [
+    "${services_path}/src/event_report.cpp",
+    "${services_path}/src/static_subscriber_manager.cpp",
+    "mock/mock_ability_manager_helper.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
+    "static_subscriber_manager_unit_test/mock_access_token_helper.cpp",
+    "static_subscriber_manager_unit_test/mock_os_account_manager_helper.cpp",
+    "static_subscriber_manager_unit_test/static_subscriber_manager_unit_test.cpp",
+  ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_native_path}:cesfwk_innerkits",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    # "ability_runtime:ability_manager",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hicollie_native:libhicollie",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("static_subscriber_connection_unit_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${ces_innerkits_path}",
+    "${services_path}/include",
+    "//foundation/ability/ability_runtime/interfaces/kits/native/ability/native",
+  ]
+
+  sources = [
+    "${services_path}/src/static_subscriber_connection.cpp",
+    "static_subscriber_connection_unit_test/mock_static_subscriber_proxy.cpp",
+    "static_subscriber_connection_unit_test/static_subscriber_connection_unit_test.cpp",
+  ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_native_path}:cesfwk_innerkits",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    # "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_sticky_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_sticky_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_subscribe_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "${common_event_service_path}/test/mock/mock_ipc_object_stub.cpp",
+    "common_event_subscribe_unit_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ability_runtime_path}/frameworks/native/ability/native:static_subscriber_ipc",
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    # "ability_runtime:ability_manager",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_unsubscribe_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_unsubscribe_unit_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_publish_ordered_event_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_publish_ordered_event_unit_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_publish_permission_event_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_publish_permission_event_unit_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_publish_manager_event_unit_test") {
+  module_out_path = module_output_path
+
+  sources = [ "common_event_publish_manager_event_unit_test.cpp" ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}
+
+ohos_unittest("common_event_hisysevent_test") {
+  module_out_path = module_output_path
+
+  sources = [ "common_event_hisysevent_test.cpp" ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}
+
+ohos_unittest("common_event_access_token_helper_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_accesstoken_kit.cpp",
+    "common_event_access_token_helper_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+  ]
+}
+
+ohos_unittest("common_event_manager_service_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${common_event_service_path}/test/mock/mock_access_token_helper.cpp",
+    "${common_event_service_path}/test/mock/mock_bundle_manager.cpp",
+    "common_event_manager_service_test.cpp",
+  ]
+
+  configs = [ ":cesfwk_services_config" ]
+
+  deps = [
+    "${ces_common_path}:libevent_common",
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    ":ability_manager_death_recipient_unit_test",
+    ":bundle_manager_death_recipient_unit_test",
+    ":common_event_access_token_helper_test",
+    ":common_event_dump_test",
+    ":common_event_freeze_test",
+    ":common_event_freeze_unit_test",
+    ":common_event_hisysevent_test",
+    ":common_event_manager_service_test",
+    ":common_event_publish_manager_event_unit_test",
+    ":common_event_publish_ordered_event_unit_test",
+    ":common_event_publish_permission_event_unit_test",
+    ":common_event_publish_system_event_test",
+    ":common_event_sticky_test",
+    ":common_event_subscribe_unit_test",
+    ":common_event_unsubscribe_unit_test",
+    ":static_subscriber_connection_unit_test",
+    ":static_subscriber_manager_unit_test",
+  ]
+}

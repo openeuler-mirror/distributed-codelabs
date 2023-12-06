@@ -1,0 +1,44 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/security/huks/huks.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "huks_standard/huks_module_test/service_ipc_test"
+
+ohos_unittest("service_ipc_test") {
+  module_out_path = module_output_path
+
+  sources = [ "src/huks_ipc_serialization_test.cpp" ]
+
+  defines = [
+    # "L2_STANDARD",
+    "_HUKS_LOG_ENABLE_",
+  ]
+  configs = [ "//base/security/huks/frameworks/config/build:coverage_flag" ]
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//base/security/huks/frameworks/huks_standard/main/common/include",
+    "include",
+    "//base/security/huks/services/huks_standard/huks_service/main/os_dependency/idl/ipc",
+  ]
+
+  sources += [ "//base/security/huks/services/huks_standard/huks_service/main/os_dependency/idl/ipc/hks_ipc_serialization.c" ]
+
+  deps = [
+    "//base/security/huks/interfaces/innerkits/huks_standard/main:libhukssdk",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}

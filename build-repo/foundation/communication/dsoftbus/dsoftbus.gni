@@ -1,0 +1,72 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ability_runtime_path = "//foundation/ability/ability_runtime"
+ability_runtime_inner_api_path = "${ability_runtime_path}/interfaces/inner_api"
+ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
+ability_runtime_services_path = "${ability_runtime_path}/services"
+hispark_pegasus_sdk_path = "//device/soc/hisilicon/hi3861v100/sdk_liteos"
+dsoftbus_root_path = "//foundation/communication/dsoftbus"
+dsoftbus_sdk_path = "//foundation/communication/dsoftbus/sdk"
+dsoftbus_core_path = "//foundation/communication/dsoftbus/core"
+ability_base_path = "//foundation/ability/ability_base"
+dsoftbus_test_path = "//foundation/communication/dsoftbus/tests"
+
+declare_args() {
+  softbus_adapter_common = "//foundation/communication/dsoftbus/adapter/common"
+  softbus_adapter_config =
+      "//foundation/communication/dsoftbus/adapter/default_config"
+  dsoftbus_feature_product_config_path =
+      "//foundation/communication/dsoftbus/adapter/default_config"
+}
+
+declare_args() {
+  dsoftbus_get_devicename = true
+  softbus_communication_wifi_feature = true
+}
+
+if (defined(global_parts_info) &&
+    !defined(global_parts_info.communication_wifi)) {
+  softbus_communication_wifi_feature = false
+}
+
+if (defined(global_parts_info) &&
+    !defined(global_parts_info.ability_ability_runtime)) {
+  dsoftbus_get_devicename = false
+}
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+  if (ohos_kernel_type == "liteos_m") {
+    import("$softbus_adapter_config/feature_config/mini/config.gni")
+    hilog_lite_include_path =
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite"
+    hilog_lite_deps_path =
+        "//base/hiviewdfx/hilog_lite/frameworks/mini:hilog_lite"
+  } else {
+    import("$softbus_adapter_config/feature_config/small/config.gni")
+    hilog_lite_include_path =
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits"
+    hilog_lite_deps_path =
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared"
+  }
+} else {
+  if (defined(os_win)) {
+    os_type = "windows"
+  } else {
+    os_type = "standard"
+  }
+  import("//build/ohos.gni")
+  import(
+      "$dsoftbus_feature_product_config_path/feature_config/standard/config.gni")
+}

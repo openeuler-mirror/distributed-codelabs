@@ -1,0 +1,115 @@
+{
+    "permissions" : [
+        {
+            "name" : "ohos.permission.PERMISSION_USED_STATS",
+            "said" : "3299",
+            "description" : "Invoke AccessToken::PrivacyKit::AddPermissionUsedRecord interface should have own this permission."
+        },
+        {
+            "name" : "ohos.permission.MICROPHONE",
+            "said" : "4005",
+            "description" : "permission required for telephony to set microphone mute."
+        },
+        {
+            "name" : "ohos.permission.WRITE_CALL_LOG",
+            "said" : "4005",
+            "description" : "permission required for telephony to write call log."
+        },
+        {
+            "name" : "ohos.permission.READ_CONTACTS",
+            "said" : "4005",
+            "description" : "permission required for telephony to read contacts info."
+        },
+        {
+            "name" : "ohos.permission.PERMISSION_START_ABILITIES_FROM_BACKGROUND",
+            "said" : "4005",
+            "description" : "Permission required for telephony to access AbillityManagerService."
+        },
+        {
+            "name" : "ohos.permission.MANAGE_DISPOSED_APP_STATUS",
+            "said" : "180",
+            "description" : "Permission required for AMS to get the disposed app status."
+        },
+        {
+            "name" : "ohos.permission.READ_DFX_SYSEVENT",
+            "said" : "3304",
+            "description" : "Permission required for battery_stats to add hisysevent listener."
+        },
+        {
+            "name" : "ohos.permission.GRANT_SENSITIVE_PERMISSIONS",
+            "said" : "401",
+            "description" : "Permission required for BMS to grant sensitive permissions."
+        },
+        {
+            "name" : "ohos.permission.REVOKE_SENSITIVE_PERMISSIONS",
+            "said" : "401",
+            "description" : "Permission required for BMS to revoke sensitive permissions."
+        },
+        {
+            "name" : "ohos.permission.MANAGE_SECURE_SETTINGS",
+            "said" : ["3301", "3308"],
+            "description" : "Permission required for settingsdata to access SA."
+        },
+        {
+            "name" : "ohos.permission.STORAGE_MANAGER",
+            "said" : ["183"],
+            "description" : "Permission required for UPMS to create or delete files shared between applications."
+        }
+    ],
+    "restart" : [
+        {
+            "name" : "reset accountmgr",
+            "said" : "180",
+            "description" : "AMS requires accountmgr to restart"
+        },
+        {
+            "name" : "reset appspawn",
+            "said" : "180",
+            "description" : "AMS requires all application to restart"
+        },
+        {
+            "name" : "reset bgtaskmgr_service",
+            "said" : "180",
+            "description" : "bgtaskmgr_service rely on AMS, need to restart"
+        },
+        {
+            "name" : "reset resource_schedule_service",
+            "said" : "180",
+            "description" : "resource_schedule_service rely on AMS, need to restart"
+        },
+        {
+            "name" : "reset device_usage_stats_service",
+            "said" : "180",
+            "description" : "device_usage_stats_service rely on AMS, need to restart"
+        }
+    ],
+    "mkdir" : [
+        {
+            "name" : "mkdir notification",
+            "said" : "3203",
+            "description" : "Move notification db from /data/system_ce/ans_standard to /data/service/el1/public/notification/."
+        },
+        {
+            "name" : "mkdir thermal",
+            "said" : "3303",
+            "description" : "create thermal directory for thermal service to put thermal info /data/service/el0/thermal/"
+        },
+        {
+            "name" : "mkdir config",
+            "said" : "3303",
+            "description" : "create config directory for thermal service to put config info /data/service/el0/thermal/config/"
+        },
+        {
+            "name" : "mkdir stats",
+            "said" : "3304",
+            "description" : "Change process battery_stats to process foundation, need to save data file to folder /data/service/el0/stats"
+        }
+    ],
+    "bootevents" : [
+        {
+            "name" : "bootevent.wms.fullscreen.ready",
+            "said" : "4606",
+            "description" : "WMS define fullscreen ready event"
+        }
+    ]
+}

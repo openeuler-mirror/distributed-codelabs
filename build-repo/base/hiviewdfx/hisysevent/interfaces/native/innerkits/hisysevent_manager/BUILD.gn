@@ -1,0 +1,63 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/hiviewdfx/hiview/hiview.gni")
+import("//build/ohos.gni")
+
+config("hisyseventmanager_config") {
+  visibility = [ "*:*" ]
+
+  include_dirs = [
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent_manager/include",
+    "//third_party/bounds_checking_function/include",
+    "//third_party/jsoncpp/include/json",
+    "include",
+  ]
+}
+
+ohos_shared_library("libhisyseventmanager") {
+  sources = [
+    "hisysevent_base_manager.cpp",
+    "hisysevent_manager.cpp",
+    "hisysevent_manager_c.cpp",
+    "hisysevent_query_callback_c.cpp",
+    "hisysevent_record.cpp",
+    "hisysevent_record_c.cpp",
+  ]
+
+  output_name = "libhisyseventmanager"
+  install_enable = true
+
+  part_name = "hisysevent_native"
+  subsystem_name = "hiviewdfx"
+
+  public_configs = [
+    "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_impl_config",
+    ":hisyseventmanager_config",
+  ]
+
+  deps = [
+    "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_impl_client",
+    "//base/hiviewdfx/hisysevent/adapter/native/idl:sys_event_service_gen_src_client",
+    "//base/hiviewdfx/hisysevent/frameworks/native/util:hisysevent_util",
+  ]
+
+  public_deps = [ "//third_party/jsoncpp:jsoncpp" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+}

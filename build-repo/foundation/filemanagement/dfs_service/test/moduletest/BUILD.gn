@@ -1,0 +1,80 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/test.gni")
+import("//foundation/filemanagement/dfs_service/distributedfile.gni")
+
+module_output_path = "storage_distributed_file_manager/distributedfiledaemon"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "${services_path}/distributedfiledaemon/include",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+    "//foundation/communication/dsoftbus/interfaces/kits/common",
+    "//base/security/device_auth/interfaces/innerkits",
+    "//third_party/json/include",
+  ]
+}
+
+ohos_moduletest("DistributedFileDaemonServiceTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${services_path}/distributedfiledaemon/src/device/device_info.cpp",
+    "${services_path}/distributedfiledaemon/src/device/device_manager_agent.cpp",
+    "${services_path}/distributedfiledaemon/src/ipc/daemon.cpp",
+    "${services_path}/distributedfiledaemon/src/ipc/daemon_stub.cpp",
+    "${services_path}/distributedfiledaemon/src/mountpoint/mount_manager.cpp",
+    "${services_path}/distributedfiledaemon/src/mountpoint/mount_point.cpp",
+    "${services_path}/distributedfiledaemon/src/multiuser/os_account_observer.cpp",
+    "${services_path}/distributedfiledaemon/src/network/devsl_dispatcher.cpp",
+    "${services_path}/distributedfiledaemon/src/network/kernel_talker.cpp",
+    "${services_path}/distributedfiledaemon/src/network/network_agent_template.cpp",
+    "${services_path}/distributedfiledaemon/src/network/session_pool.cpp",
+    "${services_path}/distributedfiledaemon/src/network/softbus/softbus_agent.cpp",
+    "${services_path}/distributedfiledaemon/src/network/softbus/softbus_session.cpp",
+    "${services_path}/distributedfiledaemon/src/network/softbus/softbus_session_dispatcher.cpp",
+  ]
+
+  sources += [ "src/distributedfiledaemon_service_test.cpp" ]
+
+  configs = [
+    ":module_private_config",
+    "${utils_path}:compiler_configs",
+  ]
+
+  defines = [ "private=public" ]
+
+  deps = [
+    "${utils_path}:libdistributedfileutils",
+    "//base/security/device_auth/services:deviceauth_sdk",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "//foundation/filemanagement/dfs_service/services/distributedfiledaemon:libdistributedfiledaemon",
+    "//third_party/googletest:gmock",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "common_event_service:cesfwk_innerkits",
+    "dataclassification:data_transit_mgr",
+    "dsoftbus:softbus_client",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}

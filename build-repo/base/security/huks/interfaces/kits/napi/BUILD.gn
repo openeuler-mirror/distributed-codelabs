@@ -1,0 +1,78 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+ohos_shared_library("huks") {
+  # sanitize = {
+  #   integer_overflow = true
+  #   cfi = true
+  #   debug = false
+  # }
+  defines = [
+    "HUKS_NAPI_ERRORCODE_WITH_MESSAGE",
+    # "L2_STANDARD",
+    "_HARDWARE_ROOT_KEY_",
+    "_HUKS_LOG_ENABLE_",
+  ]
+
+  include_dirs = [
+    "//base/security/huks/interfaces/innerkits/huks_standard/main/include",
+    "//base/security/huks/frameworks/huks_standard/main/common/include",
+    "include",
+    "include/v8",
+    "include/v9",
+  ]
+
+  sources = [
+    "src/huks_napi.cpp",
+    "src/v8/huks_napi_abort.cpp",
+    "src/v8/huks_napi_common.cpp",
+    "src/v8/huks_napi_delete_key.cpp",
+    "src/v8/huks_napi_export_key.cpp",
+    "src/v8/huks_napi_generate_key.cpp",
+    "src/v8/huks_napi_get_key_properties.cpp",
+    "src/v8/huks_napi_get_sdk_version.cpp",
+    "src/v8/huks_napi_import_key.cpp",
+    "src/v8/huks_napi_init.cpp",
+    "src/v8/huks_napi_is_key_exist.cpp",
+    "src/v8/huks_napi_update_finish.cpp",
+    "src/v9/huks_napi_abort_session.cpp",
+    "src/v9/huks_napi_attest_key_item.cpp",
+    "src/v9/huks_napi_common_item.cpp",
+    "src/v9/huks_napi_delete_key_item.cpp",
+    "src/v9/huks_napi_export_key_item.cpp",
+    "src/v9/huks_napi_generate_key_item.cpp",
+    "src/v9/huks_napi_get_key_item_properties.cpp",
+    "src/v9/huks_napi_import_key_item.cpp",
+    "src/v9/huks_napi_import_wrapped_key_item.cpp",
+    "src/v9/huks_napi_init_session.cpp",
+    "src/v9/huks_napi_is_key_item_exist.cpp",
+    "src/v9/huks_napi_update_finish_session.cpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "huks:libhukssdk",
+    "napi:ace_napi",
+  ]
+  cflags_cc = [
+    "-Wall",
+    "-Werror",
+  ]
+
+  relative_install_dir = "module/security"
+  subsystem_name = "security"
+  part_name = "huks"
+}

@@ -1,0 +1,156 @@
+{
+    "name": "@ohos/common_event_service",
+    "version": "",
+    "description": "为应用程序提供订阅、发布、退订公共事件的能力",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/notification_ces_standard",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "notification",
+        "ces"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/notification/common_event_service"
+    },
+    "component": {
+        "name": "common_event_service",
+        "subsystem": "notification",
+        "syscap": [
+            "SystemCapability.Notification.CommonEvent"
+        ],
+        "features": [
+            "common_event_service_with_graphics",
+            "common_event_service_tool_cem_enable"
+        ],
+        "hisysevent_config": [
+            "//base/notification/common_event_service/hisysevent.yaml"
+        ],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "2000KB",
+        "ram": "3000KB",
+        "deps": {
+            "components": [
+                "bundle_framework",
+                "hicollie_native",
+                "hisysevent_native",
+                "hitrace_native",
+                "ipc",
+                "access_token",
+                "safwk",
+                "ability_base",
+                "ability_runtime",
+                "eventhandler",
+                "hiviewdfx_hilog_native",
+                "napi",
+                "samgr",
+                "os_account"
+            ],
+            "third_party": [
+                "libuv"
+            ]
+        },
+        "build": {
+            "group_type": {
+                "base_group": [
+
+                ],
+                "fwk_group": [
+                    "//base/notification/common_event_service/frameworks/common:libevent_common",
+                    "//base/notification/common_event_service/frameworks/core:cesfwk_core",
+                    "//base/notification/common_event_service/frameworks/native:cesfwk_innerkits"
+                ],
+                "service_group": [
+                    "//base/notification/common_event_service/sa_profile:event_sa_profile",
+                    "//base/notification/common_event_service/services:cesfwk_services",
+                    "//base/notification/common_event_service/tools:tools_target"
+                ]
+            },
+            "inner_kits": [
+            {
+                "header": {
+                    "header_base" : "//base/notification/common_event_service/frameworks/core/include",
+                    "header_files": [
+                      "common_event_constant.h",
+                      "common_event_death_recipient.h",
+                      "common_event_listener.h",
+                      "common_event_proxy.h",
+                      "common_event_stub.h",
+                      "common_event.h",
+                      "event_receive_proxy.h",
+                      "event_receive_stub.h",
+                      "icommon_event.h",
+                      "ievent_receive.h"
+                    ]
+                  },
+                  "name":"//base/notification/common_event_service/frameworks/core:cesfwk_core"
+                },
+                {
+                  "header": {
+                    "header_base" : "//base/notification/common_event_service/interfaces/inner_api",
+                    "header_files": [
+                      "async_common_event_result.h",
+                      "common_event_data.h",
+                      "common_event_manager.h",
+                      "common_event_publish_info.h",
+                      "common_event_subscribe_info.h",
+                      "common_event_subscriber.h",
+                      "common_event_support.h",
+                      "matching_skills.h"
+                    ]
+                  },
+                  "name":"//base/notification/common_event_service/frameworks/native:cesfwk_innerkits"
+                },
+                {
+                  "header": {
+                    "header_base" : "//base/notification/common_event_service/services/include",
+                    "header_files": [
+                      "common_event_control_manager.h",
+                      "common_event_manager_service.h",
+                      "common_event_sticky_manager.h",
+                      "common_event_subscriber_manager.h",
+                      "inner_common_event_manager.h"
+                    ]
+                  },
+                  "name":"//base/notification/common_event_service/services:cesfwk_services"
+                }
+            ],
+            "test": [
+                "//base/notification/common_event_service/frameworks/common/test:unittest",
+                "//base/notification/common_event_service/frameworks/core/test/unittest:unittest",
+                "//base/notification/common_event_service/frameworks/native/test/unittest:unittest",
+                "//base/notification/common_event_service/services/test/moduletest:moduletest",
+                "//base/notification/common_event_service/services/test/unittest:unittest",
+                "//base/notification/common_event_service/test/fuzztest:fuzztest",
+                "//base/notification/common_event_service/test/systemtest:systemtest",
+                "//base/notification/common_event_service/tools:moduletest",
+                "//base/notification/common_event_service/tools:systemtest",
+                "//base/notification/common_event_service/tools:unittest",
+                "//base/notification/common_event_service/test/benchmarktest:benchmarktest"
+            ]
+        }
+    }
+}

@@ -1,0 +1,81 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/hiviewdfx/hilog/hilog.gni")
+import("//build/ohos.gni")
+
+config("libhilog_pub_config") {
+  visibility = [ ":*" ]
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("libhilog") {
+    public_configs = [ ":libhilog_pub_config" ]
+    sources = [
+      "//base/hiviewdfx/hilog/frameworks/libhilog/hilog.cpp",
+      "//base/hiviewdfx/hilog/frameworks/libhilog/vsnprintf/vsnprintf_s_p.cpp",
+      "//base/hiviewdfx/hilog/frameworks/libhilog/utils/log_utils.cpp",
+      "//base/hiviewdfx/hilog/frameworks/libhilog/utils/log_print.cpp",
+    ]
+
+    include_dirs = [
+      "//base/hiviewdfx/hilog/frameworks/libhilog/include/",
+      "//base/hiviewdfx/hilog/frameworks/libhilog/vsnprintf/include/",
+      "//base/hiviewdfx/hilog/frameworks/libhilog/utils/include/",
+    ]
+
+    defines = []
+    cflags_cc = [ "-std=c++17", "-fpermissive" ]
+    defines += [ "__LINUX__" ]
+    deps = [
+      "//third_party/bounds_checking_function:libsec_shared"
+    ]
+    install_enable = !hilog_native_feature_ohcore
+    install_images = [
+      "system",
+    ]
+    part_name = "hilog_native"
+    subsystem_name = "hiviewdfx"
+}
+
+config("libhilog_base_pub_cfg") {
+  visibility = [ "*:*" ]
+  include_dirs = [ "include" ]
+}
+
+ohos_static_library("libhilog_base") {
+  public_configs = [ ":libhilog_base_pub_cfg" ]
+
+  #deps = [ "//base/hiviewdfx/hilog/frameworks/libhilog:libhilog_base_source" ]
+
+  include_dirs = [
+    "//base/hiviewdfx/hilog/frameworks/libhilog/vsnprintf/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+  ]
+
+  # vsnprintf_sources = [ "$vsnprintf_root/vsnprintf_s_p.cpp" ]
+
+  sources = [ "//base/hiviewdfx/hilog/frameworks/libhilog/base/hilog_base.cpp" ]
+  # sources += vsnprintf_sources
+
+  public_configs += [ "//base/hiviewdfx/hilog/frameworks/libhilog/:libhilog_base_config" ]
+  configs = [ "//base/hiviewdfx/hilog/frameworks/libhilog/:libhilog_base_config" ]
+
+  defines = [
+    "__RECV_MSG_WITH_UCRED_",
+    "HILOG_PROHIBIT_ALLOCATION",
+  ]
+
+  subsystem_name = "hiviewdfx"
+  part_name = "hilog_native"
+}

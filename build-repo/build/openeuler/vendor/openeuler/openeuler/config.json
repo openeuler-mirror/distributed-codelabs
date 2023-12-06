@@ -1,0 +1,153 @@
+{
+  "product_name": "openeuler",
+  "device_company": "openeuler",
+  "target_os": "linux",
+  "type": "standard",
+  "version": "3.0",
+  "board": "openeuler",
+  "api_version": 8,
+  "enable_ramdisk": false,
+  "build_selinux": false,
+  "build_seccomp": false,
+  "support_jsapi": false,
+  "inherit": [],
+  "subsystems": [
+    {
+      "subsystem": "common",
+      "components": [
+        {
+          "component": "common"
+        }
+      ]
+    },
+    {
+      "subsystem": "commonlibrary",
+      "components": [
+        {
+          "component": "c_utils",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "hiviewdfx",
+      "components": [
+        {
+          "component": "hilog_native",
+          "features": []
+        },
+        {
+          "component": "hiviewdfx_hilog_native",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "notification",
+      "components": [
+        {
+          "component": "eventhandler",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "startup",
+      "components": [
+        {
+          "component": "init",
+          "features": [
+            "enable_ohos_startup_init_feature_ab_partition = false",
+            "enable_ohos_startup_init_feature_loader = false"
+          ]
+        }
+      ]
+    },
+    {
+      "subsystem": "security",
+      "components": [
+        {
+          "component": "huks",
+          "features": []
+        },
+        {
+          "component": "device_auth",
+          "features": []
+        },
+        {
+          "component": "dataclassification",
+          "features": []
+        },
+        {
+          "component": "device_security_level",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "communication",
+      "components": [
+        {
+          "component": "ipc",
+          "features": []
+        },
+        {
+          "component": "dsoftbus",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "systemabilitymgr",
+      "components": [
+        {
+          "component": "safwk",
+          "features": []
+        },
+        {
+          "component": "samgr",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "distributedhardware",
+      "components": [
+        {
+          "component": "device_manager",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "distributeddatamgr",
+      "components": [
+        {
+          "component": "kv_store",
+          "features": []
+        },
+        {
+          "component": "relational_store",
+          "features": []
+        },
+        {
+          "component": "datamgr_service",
+          "features": []
+        },
+        {
+          "component": "data_object",
+          "features": []
+        }
+      ]
+    },
+    {
+      "subsystem": "filemanagement",
+      "components": [
+        {
+          "component": "dfs_service",
+          "features": []
+        }
+      ]
+    }
+  ]
+}

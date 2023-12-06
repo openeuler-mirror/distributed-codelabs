@@ -1,0 +1,44 @@
+#  Copyright (c) 2022 Huawei Device Co., Ltd.
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+domain: DSLM
+
+SERVICE_START_FAILED:
+  __BASE: {type: FAULT, level: CRITICAL, tag: DSLM, desc: DSLM service start errors}
+  ERROR_TYPE: {type: UINT32, desc: error type }
+
+INIT_SELF_LEVEL_FAULT:
+  __BASE: {type: FAULT, level: CRITICAL, tag: DSLM, desc: Init self device security level fail }
+  ERROR_STR: {type: STRING, desc: error desc }
+
+CALL_INTERFACE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: DSLM, desc: the external module call DSLM interface}
+  USER_ID: {type: INT32, desc: uid}
+  COST_TIME: {type: INT32, desc: cost time}
+  RET_CODE: {type: INT32, desc: ret code}
+  SEC_LEVEL: {type: INT32, desc: security level}
+  RET_MODE: {type: INT32, desc: ret mode}
+  LOCAL_MODEL: {type: STRING, desc: local model}
+  TARGET_MODEL: {type: STRING, desc: target model}
+  PKG_NAME: {type: STRING, desc: package name}
+
+QUERY_INFO:
+  __BASE: {type: STATISTIC, level: MINOR, tag: DSLM, desc: query other device info}
+  LOCAL_MODEL: {type: STRING, desc: local model}
+  TARGET_MODEL: {type: STRING, desc: target model}
+  LOCAL_VERSION: {type: UINT64, desc: local version}
+  TARGET_VERSION: {type: UINT64, desc: target version}
+  CRED_TYPE: {type: INT32, desc: cred type}
+  RET_CODE: {type: INT32, desc: ret code}
+  COST_TIME: {type: INT32, desc: cost time}
+  SEC_LEVEL: {type: INT32, desc: security level}

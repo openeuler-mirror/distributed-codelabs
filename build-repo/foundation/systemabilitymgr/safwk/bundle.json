@@ -1,0 +1,60 @@
+{
+    "name": "@ohos/systemabilitymgr_safwk",
+    "description": "system ability framework",
+    "homePage": "https://gitee.com/openharmony",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/systemabilitymgr_safwk",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/systemabilitymgr/safwk"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "safwk",
+        "subsystem": "systemabilitymgr",
+        "features": [ "safwk_feature_coverage = false" ],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "200KB",
+        "ram": "7130KB",
+        "deps": {
+            "components": [
+                "hitrace_native",
+                "hiviewdfx_hilog_native",
+                "ipc",
+                "samgr",
+                "c_utils"
+            ],
+            "third_party": [ "libxml2" ]
+        },
+        "build": {
+            "group_type": {
+                "base_group": [
+                    "//foundation/systemabilitymgr/safwk/etc/profile:foundation_cfg",
+                    "//foundation/systemabilitymgr/safwk/etc/profile:foundation_trust",
+                    "//foundation/systemabilitymgr/safwk/services/safwk:sa_main",
+                    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk"
+                ],
+                "fwk_group": [],
+                "service_group": []
+            },
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base": "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
+                        "header_files": [
+                            "system_ability.h"
+                        ]
+                    },
+                    "name": "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk:system_ability_fwk"
+                }
+            ],
+            "test": [
+                "//foundation/systemabilitymgr/safwk/test:unittest"
+            ]
+        }
+    }
+}

@@ -1,0 +1,40 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/filemanagement/dfs_service/distributedfile.gni")
+
+group("services_target") {
+  deps = [
+    "${services_path}:distributed_file.para",
+    "${services_path}:distributedfile_etc",
+    "${services_path}:distributedfile_sa_profile",
+    "${services_path}/distributedfiledaemon:libdistributedfiledaemon",
+  ]
+}
+
+group("dfs_test_moudule") {
+  testonly = true
+  deps = [
+    "${services_path}/distributedfiledaemon/test/unittest:daemon_stub_test",
+    "${services_path}/distributedfiledaemon/test/unittest:daemon_test",
+    "${services_path}/distributedfiledaemon/test/unittest:device_manager_agent_test",
+    "${services_path}/distributedfiledaemon/test/unittest:devsl_dispatcher_test",
+    "${services_path}/distributedfiledaemon/test/unittest:kernel_talker_test",
+    "${services_path}/distributedfiledaemon/test/unittest:os_account_observer_test",
+    "${services_path}/distributedfiledaemon/test/unittest:session_pool_test",
+    "${services_path}/distributedfiledaemon/test/unittest:softbus_session_dispatcher_test",
+    "${services_path}/distributedfiledaemon/test/unittest:softbus_session_test",
+    "test/moduletest:DistributedFileDaemonServiceTest",
+  ]
+}

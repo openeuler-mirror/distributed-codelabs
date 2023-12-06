@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<configuration ver="2.0">
+    <target name="ConfigPolicyUtilsTest">
+        <preparer>
+            <option name="shell" value="mount -o remount,rw /"/>
+            <option name="shell" value="mount -o remount,rw /sys_prod"/>
+            <option name="shell" value="param set telephony.sim.opkey0 46060"/>
+            <option name="shell" value="param set telephony.sim.opkey1 46061"/>
+            <option name="shell" value="param set const.cust.follow_x_rules :custxmltest/user.xml,10:custxmltest/both.xml,100,etc/carrier/${test:-46061}"/>
+            <option name="shell" value="mkdir -p /system/custxmltest/"/>
+            <option name="shell" value="mkdir -p /sys_prod/custxmltest/"/>
+            <option name="shell" value="mkdir -p /system/etc/carrier/46060/custxmltest/"/>
+            <option name="shell" value="mkdir -p /sys_prod/etc/carrier/46060/custxmltest/"/>
+            <option name="shell" value="mkdir -p /sys_prod/etc/carrier/46061/custxmltest/"/>
+            <option name="shell" value="mkdir -p /sys_prod/etc/carrier/46060/custxmltest/custxmltest/"/>
+            <option name="shell" value="touch /system/custxmltest/system.xml"/>
+            <option name="shell" value="touch /system/custxmltest/both.xml"/>
+            <option name="shell" value="touch /system/etc/carrier/46060/custxmltest/both.xml"/>
+            <option name="shell" value="touch /sys_prod/custxmltest/both.xml"/>
+            <option name="shell" value="touch /sys_prod/custxmltest/user.xml"/>
+            <option name="shell" value="touch /sys_prod/etc/carrier/46060/custxmltest/user.xml"/>
+            <option name="shell" value="touch /sys_prod/etc/carrier/46061/custxmltest/user.xml"/>
+            <option name="shell" value="touch /sys_prod/etc/carrier/46060/custxmltest/both.xml"/>
+            <option name="shell" value="touch /sys_prod/etc/carrier/46060/custxmltest/custxmltest/both.xml"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="rm -rf /system/custxmltest/system.xml"/>
+            <option name="shell" value="rm -rf /system/custxmltest/both.xml"/>
+            <option name="shell" value="rm -rf /sys_prod/custxmltest/both.xml"/>
+            <option name="shell" value="rm -rf /sys_prod/custxmltest/user.xml"/>
+        </cleaner>
+    </target>
+</configuration>

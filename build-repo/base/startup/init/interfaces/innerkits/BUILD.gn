@@ -1,0 +1,83 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+
+syspara_sources = [
+  "syspara/param_comm.c",
+  "syspara/parameter.c",
+]
+
+config("exported_header_files") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//base/startup/init/interfaces/innerkits/include",
+    "//base/startup/init/interfaces/innerkits/include/syspara",
+    "//base/startup/init/services/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+  ]
+}
+
+include_common = [
+  "//base/startup/init/services/include",
+  "//base/startup/init/services/include/param",
+  "//base/startup/init/services/param/include",
+  "//base/startup/init/interfaces/innerkits/include",
+  "//base/startup/init/interfaces/innerkits/include/syspara",
+  "//base/startup/init/interfaces/innerkits/syspara",
+]
+
+ohos_shared_library("libbegetutil") {
+  sources = [
+    "service_control/service_control.c",
+  ]
+  sources += syspara_sources
+  sources += [ "syspara/param_wrapper.cpp" ]
+
+  include_dirs = include_common
+  deps = [
+    "//base/startup/init/services/param/linux:param_client",
+    "//base/startup/init/services/utils:libinit_utils",
+  ]
+  deps += [ "//base/startup/init/services/param/base:param_base" ]
+  external_deps = [
+    "c_utils:utils",
+  ]
+  public_configs = [ ":exported_header_files" ]
+  part_name = "init"
+  subsystem_name = "startup"
+  install_images = [
+    "system",
+  ]
+}
+
+# watcher lib must separate compilation avoid interdependence.
+ohos_shared_library("libbeget_proxy") {
+  sources = [
+    "service_watcher/service_watcher.c",
+  ]
+
+  include_dirs = include_common
+  deps = [
+    ":libbegetutil",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+  ]
+  public_configs = [ ":exported_header_files" ]
+  part_name = "init"
+  subsystem_name = "startup"
+  install_images = [ "system" ]
+}
+

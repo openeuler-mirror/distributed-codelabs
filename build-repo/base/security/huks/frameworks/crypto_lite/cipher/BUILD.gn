@@ -1,0 +1,57 @@
+#
+# Copyright (c) 2020-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+import("//build/ohos.gni")
+
+ohos_shared_library("cipher_shared") {
+  if (os_level == "standard") {
+    subsystem_name = "security"
+    part_name = "huks"
+  }
+
+  sources = [
+    "src/cipher_aes.c",
+    "src/cipher_rsa.c",
+  ]
+
+  if (os_level == "small") {
+    sources += [ "src/cipher_log_lite.c" ]
+  } else if (os_level == "standard") {
+    sources += [ "src/cipher_log.c" ]
+  }
+
+  include_dirs = [
+    "include",
+    "//third_party/bounds_checking_function/include",
+  ]
+  deps = [
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/mbedtls",
+  ]
+
+  if (os_level == "small") {
+    deps += [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+  } else if (os_level == "standard") {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    include_dirs +=
+        [ "//base/hiviewdfx/hilog/interfaces/native/innerkits/include" ]
+  }
+
+  cflags = [
+    "-Wall",
+    "-Werror",
+    "-Wno-format",
+    "-Wno-format-extra-args",
+  ]
+}

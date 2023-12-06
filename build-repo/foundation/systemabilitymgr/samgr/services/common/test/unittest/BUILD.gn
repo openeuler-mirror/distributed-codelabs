@@ -1,0 +1,55 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "samgr/samgr"
+
+ohos_unittest("ParseUtilTest") {
+  module_out_path = module_output_path
+  resource_config_file =
+      "//foundation/systemabilitymgr/samgr/test/resource/ohos_test.xml"
+
+  include_dirs = [
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common/include",
+    "//foundation/systemabilitymgr/samgr/utils/native/include",
+  ]
+
+  sources = [
+    "./parse_util_test.cpp",
+    "//foundation/systemabilitymgr/samgr/utils/native/source/tools.cpp",
+  ]
+
+  configs =
+      [ "//foundation/systemabilitymgr/samgr/test/resource:coverage_flags" ]
+
+  deps = [
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/common:samgr_common",
+    "//foundation/systemabilitymgr/samgr/services/common/test/mock:mock_sa",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  external_deps = [ "c_utils:utils" ]
+
+  public_deps = [ "//third_party/libxml2:libxml2" ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":ParseUtilTest" ]
+}

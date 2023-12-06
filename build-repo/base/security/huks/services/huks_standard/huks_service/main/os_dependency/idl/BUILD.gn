@@ -1,0 +1,66 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//base/security/huks/huks.gni")
+import("//build/ohos.gni")
+
+config("huks_config") {
+  include_dirs = [ "ipc" ]
+}
+
+ohos_static_library("libhuks_service_idl_standard_static") {
+  # sanitize = {
+  #   integer_overflow = true
+  #   cfi = true
+  #   debug = false
+  # }
+  subsystem_name = "security"
+  part_name = "huks"
+  public_configs = [ ":huks_config" ]
+  configs = [ "//base/security/huks/frameworks/config/build:coverage_flag" ]
+  include_dirs = [ "//base/security/huks/services/huks_standard/huks_service/main/os_dependency/idl/passthrough" ]
+  defines = [
+    # "L2_STANDARD",
+    "_HARDWARE_ROOT_KEY_",
+    "_HUKS_LOG_ENABLE_",
+  ]
+  sources = [
+    "ipc/hks_ipc_serialization.c",
+    "ipc/hks_ipc_service.c",
+    "ipc/hks_response.cpp",
+    "passthrough/huks_access.c",
+    "passthrough/huks_core_dynamic_hal.c",
+  ]
+  deps = [
+    "//base/security/huks/frameworks/huks_standard/main/common:libhuks_common_standard_static",
+    "//base/security/huks/services/huks_standard/huks_service/main/core:libhuks_service_core_standard_static",
+  ]
+  external_deps = [ "ipc:ipc_core" ]
+
+  external_deps += [
+    # "access_token:libaccesstoken_sdk",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  if (has_os_account_part) {
+    external_deps += [ "os_account:os_account_innerkits" ]
+    defines += [ "HAS_OS_ACCOUNT_PART" ]
+  }
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-Wall",
+    "-Werror",
+  ]
+  cflags = cflags_cc
+  complete_static_lib = true
+}

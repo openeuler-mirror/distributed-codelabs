@@ -1,0 +1,8 @@
+*.o
+libmbed*
+*.sln
+*.vcxproj
+
+# Automatically generated files
+/ssl_debug_helpers_generated.c
+/ssl_debug_helpers_generated.h

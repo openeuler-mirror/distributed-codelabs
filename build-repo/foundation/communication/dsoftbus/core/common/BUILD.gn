@@ -1,0 +1,190 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import(
+    "//foundation/communication/dsoftbus/core/connection/common/conn_common.gni")
+import(
+    "//foundation/communication/dsoftbus/core/transmission/common/trans_common.gni")
+import("//foundation/communication/dsoftbus/dsoftbus.gni")
+
+common_utils_src = [
+  "bitmap/softbus_bitmap.c",
+  "network/softbus_network_utils.c",
+  "json_utils/softbus_json_utils.c",
+  "log/softbus_log.c",
+  "message_handler/message_handler.c",
+  "queue/softbus_queue.c",
+  "security/sequence_verification/softbus_sequence_verification.c",
+  "softbus_property/softbus_feature_config.c",
+  "utils/softbus_utils.c",
+  "dfx/hisysevent_adapter/softbus_hisysevt_bus_center.c",
+  "dfx/hisysevent_adapter/softbus_hisysevt_common.c",
+  "dfx/hisysevent_adapter/softbus_hisysevt_connreporter.c",
+  "dfx/hisysevent_adapter/softbus_hisysevt_discreporter.c",
+  "dfx/hisysevent_adapter/softbus_hisysevt_transreporter.c",
+]
+
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    hilog_lite_include_path =
+        "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite"
+    diff_deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/mini:hilog_lite",
+      "//build/lite/config/component/cJSON:cjson_static",
+    ]
+    build_type = "static_library"
+  } else {
+    hilog_lite_include_path =
+        "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits"
+    diff_deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//build/lite/config/component/cJSON:cjson_shared",
+    ]
+    build_type = "shared_library"
+  }
+  config("dsoftbus_utils_interface") {
+    include_dirs = [
+      "$dsoftbus_root_path/core/common/include",
+      "$dsoftbus_root_path/interfaces/kits/common",
+      "$dsoftbus_root_path/core/common/dfx/hidumper_adapter/include",
+      "$dsoftbus_root_path/core/common/dfx/hisysevent_adapter/include",
+      "$softbus_adapter_common/include",
+      "$hilog_lite_include_path",
+    ]
+    include_dirs += conn_common_inc + trans_common_inc
+    if (board_toolchain_type != "iccarm") {
+      cflags = [
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Os",
+      ]
+    } else {
+      cflags = [
+        "--diag_suppress",
+        "Pe186",
+      ]
+    }
+    cflags_cc = cflags
+  }
+
+  target(build_type, "softbus_utils") {
+    include_dirs = [
+      "$dsoftbus_root_path/interfaces/kits/common",
+      "$dsoftbus_root_path/components/nstackx/nstackx_core/dfile/interface",
+    ]
+    include_dirs += conn_common_inc + trans_common_inc
+    dfx_src = [
+      "dfx/hidumper_adapter/softbus_hidumper_trans_virtual.c",
+      "dfx/hidumper_adapter/softbus_hidumper_buscenter_virtual.c",
+      "dfx/hidumper_adapter/softbus_hidumper_disc_virtual.c",
+      "dfx/hidumper_adapter/softbus_hidumper_conn_virtual.c",
+      "dfx/hidumper_adapter/softbus_hidumper_interface_virtual.c",
+      "dfx/hisysevent_adapter/softbus_hisysevt_nstack_virtual.c",
+    ]
+    sources = common_utils_src
+    sources += conn_common_src + trans_common_src + dfx_src
+    if (board_toolchain_type != "iccarm") {
+      cflags = [
+        "-Wall",
+        "-fPIC",
+        "-std=c99",
+      ]
+    }
+    if (ohos_kernel_type == "liteos_m") {
+      defines = [ "SOFTBUS_MINI_SYSTEM" ]
+      defines += [ "__STDC_FORMAT_MACROS" ]
+    } else {
+      defines = [ "DEFAULT_STORAGE_PATH=\"/storage/data\"" ]
+      defines += [ "__STDC_FORMAT_MACROS" ]
+      defines += [ "SOFTBUS_SMALL_SYSTEM" ]
+    }
+    deps = [ "$dsoftbus_root_path/adapter:softbus_adapter" ]
+    deps += diff_deps
+    public_configs = [ ":dsoftbus_utils_interface" ]
+  }
+} else {
+  dstream_native_source_path = rebase_path("$dsoftbus_root_path")
+  dstream_dep_file = "components/nstackx_enhanced/fillp/BUILD.gn"
+  enhanced = exec_script("$dsoftbus_root_path/check_sub_module.py",
+                         [
+                           "$dstream_native_source_path",
+                           "$dstream_dep_file",
+                         ],
+                         "value")
+
+  cflags = [ "-DFILLP_LINUX" ]
+  config("dsoftbus_utils_interface_L2") {
+    include_dirs = [
+      "$dsoftbus_root_path/core/common/include",
+      "$dsoftbus_root_path/core/common/dfx/hidumper_adapter/include",
+      "$dsoftbus_root_path/core/common/dfx/hisysevent_adapter/include",
+      "$dsoftbus_root_path/interfaces/kits/common",
+      "$softbus_adapter_common/include",
+      "$dsoftbus_root_path/components/nstackx/nstackx_core/dfile/interface",
+    ]
+    include_dirs += conn_common_inc + trans_common_inc
+  }
+  ohos_shared_library("softbus_utils") {
+    include_dirs = [
+      "$dsoftbus_root_path/interfaces/kits/common",
+      "$dsoftbus_root_path/core/bus_center/utils/include",
+      "$dsoftbus_root_path/core/common/include",
+      "$dsoftbus_root_path/components/nstackx/fillp/include",
+      "$dsoftbus_root_path/components/nstackx/nstackx_core/dfile/interface",
+      "$dsoftbus_root_path/components/nstackx/nstackx_util/interface",
+      "$dsoftbus_root_path/components/nstackx/nstackx_ctrl/interface",
+      "//third_party/cJSON",
+      "//third_party/bounds_checking_function/include",
+    ]
+    include_dirs += conn_common_inc + trans_common_inc
+    dfx_source = [
+      "dfx/hidumper_adapter/softbus_hidumper.c",
+      "dfx/hidumper_adapter/softbus_hidumper_interface.c",
+      "dfx/hidumper_adapter/softbus_hidumper_disc.c",
+      "dfx/hidumper_adapter/softbus_hidumper_conn.c",
+      "dfx/hidumper_adapter/softbus_hidumper_nstack.c",
+      "dfx/hidumper_adapter/softbus_hidumper_trans.c",
+      "dfx/hidumper_adapter/softbus_hidumper_buscenter.c",
+      "dfx/hisysevent_adapter/softbus_hisysevt_nstack.c",
+    ]
+    sources = common_utils_src + conn_common_src + trans_common_src + dfx_source
+    sources += [ "$dsoftbus_root_path/core/common/utils/sqlite3_utils.c" ]
+    defines = [ "DEFAULT_STORAGE_PATH=\"/data/service/el1/public\"" ]
+    defines += [ "SOFTBUS_STANDARD_SYSTEM" ]
+    defines += [ "__STDC_FORMAT_MACROS" ]
+    if (is_asan) {
+      defines += [ "ASAN_BUILD" ]
+    }
+
+    public_configs = [ ":dsoftbus_utils_interface_L2" ]
+    public_deps = [
+      "$dsoftbus_root_path/adapter:softbus_adapter",
+      "//third_party/cJSON:cjson",
+      "//third_party/sqlite:sqlite",
+    ]
+    if (!enhanced) {
+      cflags += [ "-DFILLP_ENHANCED" ]
+      public_deps += [
+        "$dsoftbus_root_path/components/nstackx/fillp:FillpSo.open",
+        "$dsoftbus_root_path/components/nstackx/nstackx_core/dfile:nstackx_dfile.open",
+        "$dsoftbus_root_path/components/nstackx/nstackx_ctrl:nstackx_ctrl",
+        "$dsoftbus_root_path/components/nstackx/nstackx_util:nstackx_util.open",
+      ]
+    }
+    if (is_standard_system) {
+      external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    }
+    part_name = "dsoftbus"
+    subsystem_name = "communication"
+  }
+}

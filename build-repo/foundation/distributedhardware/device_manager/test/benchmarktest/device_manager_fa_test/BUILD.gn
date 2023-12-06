@@ -1,0 +1,60 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+module_output_path = "device_manager/devicemanager"
+
+ohos_benchmarktest("DeviceManagerFaTest") {
+  module_out_path = module_output_path
+  sources = [ "device_manager_fa_test.cpp" ]
+
+  include_dirs = [
+    "${common_path}/include",
+    "${innerkits_path}/native_cpp/include/notify",
+    "${services_path}/include/dependency/softbus",
+    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
+    "//foundation/communication/dsoftbus/interfaces/kits/discovery",
+    "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+    "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+    "//foundation/communication/dsoftbus/interfaces/kits/common",
+    "//foundation/communication/dsoftbus/interfaces/kits/transport",
+    "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+  ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  deps = [
+    "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "//foundation/arkui/napi:ace_napi",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp:devicemanagersdk",
+    "//third_party/benchmark:benchmark",
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+group("benchmarktest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    # deps file
+    ":DeviceManagerFaTest",
+  ]
+}

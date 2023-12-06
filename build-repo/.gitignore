@@ -1,0 +1,48 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+out/*
+ohos_config.json
+
+# Python output
+*.pyc
+**/__pycache__
+
+# IDE config
+.idea/
+.vscode/
+
+# ccache output
+.ccache
+ccache.log*
+demo/dsoftbus/softbus_client

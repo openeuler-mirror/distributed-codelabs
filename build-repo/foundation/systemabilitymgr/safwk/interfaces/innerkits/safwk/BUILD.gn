@@ -1,0 +1,67 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+
+################################################################################
+
+config("system_ability_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "../../../services/safwk/include",
+    "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk",
+  ]
+}
+
+config("system_config") {
+  include_dirs =
+      [ "//foundation/systemabilitymgr/samgr/services/lsamgr/include" ]
+}
+
+config("system_ability_all_deps_config") {
+  include_dirs =
+      [ "//foundation/systemabilitymgr/safwk/interfaces/innerkits/safwk" ]
+}
+
+ohos_shared_library("system_ability_fwk") {
+  sources = [
+    "../../../services/safwk/src/local_ability_manager.cpp",
+    "../../../services/safwk/src/local_ability_manager_stub.cpp",
+    "../../../services/safwk/src/system_ability.cpp",
+  ]
+
+  configs = [
+    ":system_config",
+    "//foundation/systemabilitymgr/safwk/test/resource:coverage_flags",
+  ]
+
+  public_configs = [ ":system_ability_config" ]
+  all_dependent_configs = [ ":system_ability_all_deps_config" ]
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      # "hitrace_native:hitrace_meter",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "samgr:samgr_common",
+      "samgr:samgr_proxy",
+    ]
+  }
+
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+  part_name = "safwk"
+  subsystem_name = "systemabilitymgr"
+}
+################################################################################

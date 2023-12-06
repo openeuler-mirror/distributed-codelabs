@@ -1,0 +1,87 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/notification/common_event_service/event.gni")
+import("//build/test.gni")
+
+module_output_path = "common_event_service/systemtest"
+
+ohos_systemtest("ActsFuzzTest") {
+  module_out_path = module_output_path
+  resource_config_file = "${common_event_service_path}/test/systemtest/common/resource/fuzzTest/ohos_test.xml"
+
+  sources = [
+    "${common_event_service_path}/test/systemtest/common/resource/fuzzTest/src/fuzzTestManager.cpp",
+    "${common_event_service_path}/test/systemtest/common/resource/fuzzTest/src/getparam.cpp",
+    "actsFuzzTest.cpp",
+  ]
+
+  configs = [ "${common_event_service_path}/test/systemtest/common/ces:cesfwk_kits_test_config" ]
+
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "${common_event_service_path}/test/systemtest/common/resource",
+    "//third_party/json/single_include",
+    "${services_path}/include",
+    "${ability_runtime_path}/interfaces/kits/native/appkit/app",
+    "${ability_runtime_inner_api_path}/ability_manager/include",
+    "${ability_runtime_path}/interfaces/kits/native/ability/native",
+    "${ability_runtime_services_path}/abilitymgr/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
+
+  cflags = []
+
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  deps = [
+    "${ability_runtime_inner_api_path}/ability_manager:ability_manager",
+    "${ability_runtime_inner_api_path}/app_manager:app_manager",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
+    "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
+    "${ability_runtime_services_path}/abilitymgr:abilityms",
+    "${ces_common_path}:libevent_common",
+    "${ces_native_path}:cesfwk_innerkits",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    # "ability_base:configuration",
+    # "ability_base:want",
+    # "ability_base:zuri",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "relational_store:native_appdatafwk",
+    "relational_store:native_dataability",
+    "relational_store:native_rdb",
+  ]
+
+  if (common_event_service_with_graphics) {
+    external_deps += [ "input:libmmi-client" ]
+  }
+}
+
+group("fuzzTest") {
+  testonly = true
+
+  deps = [ ":ActsFuzzTest" ]
+}

@@ -1,0 +1,312 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+SUBSYSTEM_DIR = "//foundation/communication/ipc"
+IPC_TEST_ROOT = "//foundation/communication/ipc/ipc/test"
+MODULE_OUTPUT_PATH = "ipc"
+
+ohos_unittest("IPCNativeUnitTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [
+    "//utils/system/safwk/native/include",
+    "//foundation/communication/ipc/ipc/native/c/rpc/include",
+    "//foundation/communication/ipc/ipc/native/c/ipc_adapter/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
+    "//foundation/communication/ipc/native/src/core/include",
+  ]
+
+  sources = [
+    "buffer_object_unittest.cpp",
+    "databus_session_callback_unittest.cpp",
+    "dbinder_callback_stub_unittest.cpp",
+    "dbinder_session_object_unittest.cpp",
+    "ipc_core_unittest.cpp",
+    "ipc_object_proxy_unittest.cpp",
+    "ipc_process_skeleton_unittest.cpp",
+    "ipc_thread_skeleton_unittest.cpp",
+  ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+ohos_unittest("IPCFileDescOpsTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [
+    "//utils/system/safwk/native/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
+    "//foundation/communication/ipc/native/src/core/include",
+  ]
+
+  sources = [
+    "ipc_file_desc_unittest.cpp",
+    "iremote_object_unitest.cpp",
+  ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+ohos_unittest("BinderConnectorTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [ "//utils/system/safwk/native/include" ]
+
+  sources = [ "ipc_connector_unittest.cpp" ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+ohos_unittest("BinderInvokerUnitTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [
+    "//utils/system/safwk/native/include",
+    "//foundation/communication/ipc/ipc/native/c/adapter/access_token/include",
+    "//foundation/communication/ipc/ipc/native/c/rpc/include",
+  ]
+
+  sources = [ "binder_invoker_unittest.cpp" ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+ohos_unittest("IPCHiTraceUnitTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [ "//utils/system/safwk/native/include" ]
+
+  sources = [ "ipc_hitrace_unittest.cpp" ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+if (support_jsapi) {
+  ohos_unittest("IPCNapiUnitTest") {
+    module_out_path = MODULE_OUTPUT_PATH
+
+    include_dirs = [
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//foundation/arkui/napi/interfaces/kits",
+    ]
+
+    sources = [ "ipc_napi_unittest.cpp" ]
+    configs = []
+
+    deps = [
+      "//foundation/arkui/napi:ace_napi",
+      "//third_party/googletest:gmock_main",
+      "//third_party/googletest:gtest_main",
+    ]
+
+    external_deps = [
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc_js:rpc",
+    ]
+
+    resource_config_file =
+        "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+  }
+}
+
+ohos_unittest("IPCMockUnitTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [
+    "//utils/system/safwk/native/include",
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/ipc/ipc/native/src/mock/include",
+    "//foundation/communication/ipc/ipc/native/c/rpc/include",
+    "//foundation/communication/ipc/ipc/native/c/adapter/access_token/include",
+  ]
+
+  sources = [ "ipc_binder_databus_invoker_unittest.cpp" ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+ohos_unittest("InvokerFactoryTest") {
+  module_out_path = MODULE_OUTPUT_PATH
+
+  include_dirs = [
+    "//utils/system/safwk/native/include",
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/communication/ipc/ipc/native/src/mock/include",
+    "//foundation/communication/ipc/ipc/native/c/rpc/include",
+    "//foundation/communication/ipc/ipc/native/c/adapter/access_token/include",
+  ]
+
+  sources = [ "invoker_factory_unittest.cpp" ]
+
+  configs = [
+    "$SUBSYSTEM_DIR:ipc_util_config",
+    "$IPC_TEST_ROOT:ipc_test_config",
+  ]
+
+  deps = [
+    "$IPC_TEST_ROOT/auxiliary/native:TestAssistance",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  resource_config_file =
+      "//foundation/communication/ipc/test/resource/ipc/ohos_test.xml"
+}
+
+###############################################################################
+group("unittest") {
+  testonly = true
+  deps = [
+    ":BinderConnectorTest",
+    ":BinderInvokerUnitTest",
+    ":IPCFileDescOpsTest",
+    ":IPCHiTraceUnitTest",
+    ":IPCMockUnitTest",
+    ":IPCNativeUnitTest",
+    ":InvokerFactoryTest",
+  ]
+  if (support_jsapi) {
+    deps += [ ":IPCNapiUnitTest" ]
+  }
+}
+
+###############################################################################
+

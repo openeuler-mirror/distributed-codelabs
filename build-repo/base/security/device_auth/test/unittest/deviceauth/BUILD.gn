@@ -1,0 +1,138 @@
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/security/device_auth/deps_adapter/deviceauth_hals.gni")
+import("//base/security/device_auth/services/deviceauth.gni")
+import("//base/security/device_auth/services/key_agree_sdk/key_agree_sdk.gni")
+import("//build/test.gni")
+
+module_output_path = "device_auth/deviceauth_test"
+
+ohos_unittest("deviceauth_llt") {
+  module_out_path = module_output_path
+
+  include_dirs = inc_path
+  include_dirs += hals_inc_path
+
+  include_dirs += [
+    "./include",
+    "${dev_frameworks_path}/inc/hiview_adapter",
+  ]
+
+  include_dirs += [
+    "//third_party/cJSON",
+    "//commonlibrary/c_utils/base/include",
+    "//third_party/openssl/include/",
+    "//base/security/huks/interfaces/innerkits/huks_standard/main/include",
+    "//third_party/mbedtls/include",
+    "//third_party/mbedtls/include/mbedtls",
+  ]
+
+  sources = hal_common_files
+  sources += [
+    "${key_management_adapter_path}/impl/src/standard/crypto_hash_to_point.c",
+    "${key_management_adapter_path}/impl/src/standard/huks_adapter.c",
+    "${key_management_adapter_path}/impl/src/standard/mbedtls_ec_adapter.c",
+    "${os_adapter_path}/impl/src/hc_log.c",
+    "${os_adapter_path}/impl/src/linux/hc_condition.c",
+    "${os_adapter_path}/impl/src/linux/hc_file.c",
+    "${os_adapter_path}/impl/src/linux/hc_init_protection.c",
+    "${os_adapter_path}/impl/src/linux/hc_thread.c",
+    "${os_adapter_path}/impl/src/linux/hc_types.c",
+    "source/hc_dev_info_mock.c",
+  ]
+
+  sources += dev_frameworks_files
+  sources += deviceauth_common_files
+  sources += database_manager_files
+  sources += broadcast_manager_files
+  sources += hiview_adapter_mock_files
+  sources += soft_bus_channel_mock_files
+
+  sources += group_auth_files
+  sources += group_auth_account_unrelated_files
+  sources += group_auth_account_related_files
+
+  sources += group_manager_files
+  sources += group_manager_peer_to_peer_files
+  sources += group_manager_identical_account_files
+  sources += group_manager_across_account_files
+
+  sources += authenticators_p2p_files
+  sources += authenticators_p2p_iso_files
+  sources += authenticators_p2p_pake_files
+  sources += authenticators_standard_exchange_task_files
+  sources += authenticators_account_related_files
+
+  sources -= [
+    "${authenticators_path}/src/account_unrelated/iso_task/iso_task_main.c",
+    "${authenticators_path}/src/account_unrelated/pake_task/pake_v1_task/pake_v1_task_main.c",
+  ]
+
+  sources += [
+    "source/deviceauth_standard_test.cpp",
+    "source/os_account_adapter_mock.c",
+    "source/protocol_task_main_mock.c",
+  ]
+  defines = [
+    "P2P_PAKE_DL_PRIME_LEN_384",
+    "P2P_PAKE_EC_TYPE",
+  ]
+
+  cflags = [
+    "-DHILOG_ENABLE",
+    "-DDEV_AUTH_DEBUG_PRINTF",
+  ]
+
+  deps = [
+    "//base/security/huks/interfaces/innerkits/huks_standard/main:libhukssdk",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//third_party/mbedtls:mbedtls_shared",
+    "//third_party/openssl:libcrypto_static",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}
+
+ohos_unittest("key_agree_sdk_llt") {
+  module_out_path = module_output_path
+
+  include_dirs = hals_inc_path + key_agree_inc_path
+  include_dirs += [ "./include" ]
+
+  sources = key_agree_sdk_file
+  sources += key_agree_deviceauth_common_files
+  sources += key_agree_hal_common_files
+  sources += [ "source/key_agree_sdk_test.cpp" ]
+
+  cflags = [ "-DHILOG_ENABLE" ]
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  deps = [
+    "${deps_adapter_path}:${hal_module_name}",
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/cJSON:cjson_static",
+  ]
+
+  defines = [ "HILOG_ENABLE" ]
+  defines += key_agree_defines
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}

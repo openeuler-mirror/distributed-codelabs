@@ -1,0 +1,67 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+# test unittest
+ohos_unittest("dslm_test") {
+  install_enable = true
+  testonly = true
+  part_name = "device_security_level"
+  subsystem_name = "security"
+  module_out_path = "${part_name}/${target_name}"
+
+  sources = [
+    "//base/security/device_security_level/oem_property/ohos/dslm_ohos_credential.c",
+    "//base/security/device_security_level/services/sa/common/dslm_rpc_process.c",
+    "dslm_baselib_utils_test.cpp",
+    "dslm_msg_interface_mock.cpp",
+    "dslm_oem_property_test.cpp",
+    "dslm_request_callback_mock.cpp",
+    "dslm_rpc_process_test.cpp",
+    "dslm_test.cpp",
+  ]
+
+  include_dirs = [
+    "//base/security/device_security_level/common/include",
+    "//base/security/device_security_level/interfaces/inner_api/include",
+    "//base/security/device_security_level/interfaces/inner_api/src/standard",
+    "//base/security/device_security_level/services/include",
+    "//base/security/device_security_level/services/dslm",
+    "//base/security/device_security_level/services/sa/common",
+    "//base/security/device_security_level/baselib/msglib/include",
+    "//base/security/device_security_level/oem_property/common",
+    "//base/security/device_security_level/oem_property/ohos/impl",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  deps = [
+    "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//base/security/device_security_level/baselib/utils:utils_static",
+    "//base/security/device_security_level/oem_property/ohos:dslm_ohos_cred_obj",
+    "//base/security/device_security_level/services/common:service_common_obj",
+    "//base/security/device_security_level/services/dslm:service_dslm_test_obj",
+    "//base/security/device_security_level/services/msg:service_msg_obj",
+    "//third_party/googletest:gmock",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_security_level:dslm_sdk",
+    "hilog_native:libhilog",
+    "huks:libhukssdk",
+  ]
+}

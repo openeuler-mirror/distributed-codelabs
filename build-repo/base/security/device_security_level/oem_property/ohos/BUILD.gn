@@ -1,0 +1,83 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+# sa lib
+ohos_shared_library("dslm_service") {
+  sources = [ "dslm_ohos_credential.c" ]
+
+  include_dirs = [
+    "//base/security/device_security_level/common/include",
+    "//base/security/device_security_level/interfaces/inner_api/include",
+  ]
+
+  deps = [
+    ":dslm_ohos_cred_obj",
+    "//base/security/device_security_level/baselib/utils:utils_static",
+    "//base/security/device_security_level/services/sa:service_sa_static",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+  ]
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}
+
+ohos_source_set("dslm_ohos_cred_obj") {
+  sources = [
+    "impl/dslm_ohos_init.c",
+    "impl/dslm_ohos_request.c",
+    "impl/dslm_ohos_verify.c",
+    "impl/external_interface_adapter.c",
+    "impl/hks_adapter.c",
+  ]
+
+  include_dirs = [
+    "//base/security/device_security_level/common/include",
+    "//base/security/device_security_level/interfaces/inner_api/include",
+    "//base/security/device_security_level/services/include",
+    "//base/security/device_security_level/oem_property/common",
+    "//base/security/device_auth/interfaces/innerkits",
+  ]
+
+  deps = [
+    "//base/security/device_auth/services:deviceauth_sdk",
+    "//base/security/device_security_level/baselib/utils:utils_static",
+    "//base/security/device_security_level/oem_property/common:oem_common_obj",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_auth:deviceauth_sdk",
+    "hilog_native:libhilog",
+    "huks:libhukssdk",
+  ]
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}
+
+ohos_prebuilt_etc("dslm_ohos_cred_file") {
+  source = "dslm_finger.cfg"
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}

@@ -1,0 +1,86 @@
+{
+    "name": "@ohos/huks",
+    "description": "The provider of key and certificate manangement capbility, which belongs to security subsystem",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "base/security/huks"
+    },
+    "dirs":{},
+    "scripts": {
+      "install": "DEST_PATH=${DEP_BUNDLE_BASE}/base/security/huks && mkdir -p $DEST_PATH && cp -r ./* $DEST_PATH"
+    },
+    "author": {},
+    "repository": "",
+    "component": {
+      "name": "huks",
+      "subsystem": "security",
+      "syscap": [
+          "SystemCapability.Security.Huks",
+          "SystemCapability.Security.Cipher"
+          ], 
+      "features": [],
+      "adapted_system_type": [
+          "standard",
+          "small",
+          "mini"
+        ],
+      "hisysevent_config": [
+          "//base/security/huks/hisysevent.yaml"
+        ],
+      "rom": "5000KB",
+      "ram": "500kB",
+      "deps": {
+        "components": [
+          "ability_base",
+          "access_token",
+          "bundle_framework",
+          "common",
+          "common_event_service",
+          "hisysevent_native",
+          "hitrace_native",
+          "hiviewdfx_hilog_native",
+          "ipc",
+          "napi",
+          "os_account",
+          "safwk",
+          "samgr",
+          "thirdparty_bounds_checking_function",
+          "c_utils"
+        ],
+        "third_party": [ 
+          "openssl",
+          "bounds_checking_function"
+        ]
+      },
+      "build": {
+        "group_type": {
+          "base_group": [],
+          "fwk_group": [
+            "//base/security/huks:fwk_group"
+          ],
+          "service_group": [
+            "//base/security/huks:service_group"
+          ]
+        },
+        "inner_kits": [
+          {
+            "name": "//base/security/huks/interfaces/innerkits/huks_standard/main:libhukssdk",
+            "header": {
+              "header_files": [
+                "hks_api.h",
+                "hks_type.h",
+                "hks_param.h"
+              ],
+              "header_base": "//base/security/huks/interfaces/innerkits/huks_standard/main/include"
+            }
+          }
+        ],
+        "test": [ 
+          "//base/security/huks:huks_sdk_test",
+          "//base/security/huks/test/fuzz_test:fuzztest"
+        ]
+      }
+    }
+  }

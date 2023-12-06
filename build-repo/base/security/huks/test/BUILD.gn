@@ -1,0 +1,44 @@
+#
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+group("unittest") {
+  if (os_level == "standard") {
+    testonly = true
+    deps = [
+      "./unittest/huks_standard_test/crypto_engine_test:crypto_engine_unit_test",
+      "./unittest/huks_standard_test/interface_inner_test/alg_module_test:huks_mt_test",
+      "./unittest/huks_standard_test/interface_inner_test/sdk_test:hukssdk_test",
+      "./unittest/huks_standard_test/module_test:huks_module_test",
+      "./unittest/huks_standard_test/module_test/mock:huks_mock_test",
+      "./unittest/huks_standard_test/module_test/service_test/huks_service/os_dependency/idl/ipc:service_ipc_test",
+      "./unittest/huks_standard_test/module_test/service_test/huks_service/systemapi_wrap/useridm_test:huks_useridm_wrap_test",
+      "./unittest/huks_standard_test/storage_multithread_test:huks_multithread_test",
+      "./unittest/huks_standard_test/three_stage_test:huks_UT_test",
+    ]
+  } else {
+    if (ohos_kernel_type == "liteos_m") {
+      #deps = [ "./unittest/huks_lite_test/liteos_m_adapter:huks_3.0_test" ]
+    } else {
+      deps = [ "./unittest/huks_lite_test/liteos_a_adapter:huks_3.0_test" ]
+    }
+  }
+}
+
+group("reliability") {
+  testonly = true
+  if (os_level == "standard") {
+    deps = [ "./reliability:huks_stability_test" ]
+  }
+}

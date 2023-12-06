@@ -1,0 +1,48 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("utils_static_config") {
+  include_dirs = [ "include" ]
+}
+
+# utils static lib
+ohos_static_library("utils_static") {
+  sources = [
+    "src/utils_base64.c",
+    "src/utils_datetime.c",
+    "src/utils_hexstring.c",
+    "src/utils_json.c",
+    "src/utils_state_machine.c",
+    "src/utils_timer.cpp",
+    "src/utils_tlv.c",
+    "src/utils_work_queue.c",
+  ]
+
+  include_dirs = [ "include" ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  public_configs = [ ":utils_static_config" ]
+
+  deps = [ "//third_party/cJSON:cjson" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog_native:libhilog",
+  ]
+
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}

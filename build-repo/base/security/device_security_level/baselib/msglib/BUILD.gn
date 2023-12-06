@@ -1,0 +1,49 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+# messenger_static lib
+config("messenger_static_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_static_library("messenger_static") {
+  include_dirs = [
+    "include",
+    "src",
+    "src/standard",
+  ]
+
+  sources = [
+    "src/messenger.c",
+    "src/standard/messenger_device_session_manager.c",
+    "src/standard/messenger_device_status_manager.cpp",
+    "src/standard/messenger_impl.c",
+  ]
+
+  deps = [ "//base/security/device_security_level/baselib/utils:utils_static" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "dsoftbus:softbus_client",
+    "hilog_native:libhilog",
+  ]
+
+  configs = [ "//base/security/device_security_level/common:common_configs" ]
+
+  public_configs = [ ":messenger_static_config" ]
+  part_name = "device_security_level"
+  subsystem_name = "security"
+}

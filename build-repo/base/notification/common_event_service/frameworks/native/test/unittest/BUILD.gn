@@ -1,0 +1,103 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/notification/common_event_service/event.gni")
+import("//build/test.gni")
+
+module_output_path = "common_event_service/frameworks/native"
+
+config("kits_natvie_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+  ]
+
+  cflags = []
+
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
+ohos_unittest("matching_skills_test") {
+  module_out_path = module_output_path
+
+  sources = [ "matching_skills_test.cpp" ]
+
+  configs = [ ":kits_natvie_config" ]
+
+  deps = [ "${ces_native_path}:cesfwk_innerkits" ]
+
+  # external_deps = [ "ability_base:want" ]
+}
+
+ohos_unittest("common_event_subscribe_test") {
+  module_out_path = module_output_path
+
+  sources = [ "common_event_subscribe_test.cpp" ]
+
+  configs = [ ":kits_natvie_config" ]
+
+  deps = [
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("common_event_unsubscribe_test") {
+  module_out_path = module_output_path
+
+  sources = [ "common_event_unsubscribe_test.cpp" ]
+
+  configs = [ ":kits_natvie_config" ]
+
+  deps = [
+    "${ces_core_path}:cesfwk_core",
+    "${ces_native_path}:cesfwk_innerkits",
+    "${services_path}:cesfwk_services",
+  ]
+
+  external_deps = [
+    # "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    #"bundle_framework:appexecfwk_base",
+    #"bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    ":common_event_subscribe_test",
+    ":common_event_unsubscribe_test",
+    ":matching_skills_test",
+  ]
+}
