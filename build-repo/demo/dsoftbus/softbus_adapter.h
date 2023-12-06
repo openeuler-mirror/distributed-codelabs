@@ -18,6 +18,9 @@ private:
     int _publishId;
     static std::unordered_map<int, std::string> sessionNetMap;
     static std::unordered_map<std::string, int> netSessionMap;
+
+    int GetRandPublishID();
+
 public:
     SoftbusAdapter();
     ~SoftbusAdapter();

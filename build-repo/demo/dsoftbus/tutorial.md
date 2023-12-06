@@ -154,18 +154,121 @@ gif图
     int SetFileReceiveListener(const char *pkgName, const char *sessionName,const IFileReceiveListener *recvListener, const char *rootDir);
 ```
 
-### 代码目录结构
+## client使用指导
 
-参见：
+以下操作在设备A/B上都需要操作
 
-### 接口列表
+1. 物理机环境安装openEuler LTS SP2以上版本，环境需要准备好binder驱动 [binder驱动安装指导](https://gitee.com/src-openeuler/communication_ipc/blob/openEuler-22.03-LTS-SP2/README.md "binder")
 
-参见：
+2. 编译softbus_client
+```
+bash build-repo/demo/dsoftbus/build.sh
+```
 
-## 虚拟化测试
+3. 安装softbus_server
+```
+dnf install dsoftbus -y
+```
 
-## 常见问题
+4. 启动softbus_server
+```
+/system/bin/start_services.sh all
+```
 
+#### 物理机单client场景：物理机上server与client一一对应
+1. 在物理机A、物理机B上分别启动softbus_client二进制文件
+```
+./softbus_client
+```
 
+2. 在物理机A上打开session
+```
+openA
+```
 
-## 分布式中间件Sig相关软件仓
+3. 在A上执行命令发送消息给B
+```
+sendAll "hello"
+```
+
+4. 此时在B上的softbus_client看到字符串"hello"说明消息通信成功
+
+#### 容器多client场景
+1. 执行脚本在物理机A打包加载容器镜像，[base镜像链接](https://repo.openeuler.org/openEuler-22.03-LTS-SP2/docker_img/aarch64/openEuler-docker.aarch64.tar.xz "img")
+```
+bash build-repo/demo/dsoftbus/docker_img_build.sh
+```
+
+2. 在物理机A启动容器镜像softbus_client，并将相关SDK、binder驱动映射到容器中
+```
+docker run  -it  --privileged --net=host --name=softbus  -v /dev/binderfs/binder:/dev/binder  -v  /system:/system  -v /usr/lib64:/usr/lib64  -p 5684:5684/udp softbus_client  bash
+```
+
+3. 镜像中写/etc/SI文件，作为该容器中softclient的标志，注意需要和组网中其他client的不一致避免冲突
+```
+echo 123 > /etc/SI
+```
+
+4. 容器中启动softbus_client
+```
+./home/softbus_client
+```
+
+5. 在本节点上可重复步骤1-3启动不同的client
+
+6. 在物理机B启动softbus
+```
+./build-repo/demo/dsoftbus/softbus_client
+```
+
+7. 在设备A中的各个中client分别执行命令打开所有连接
+```
+openA
+```
+
+8. 在设备B中client查看所有已经打开的session
+```
+conDevices
+```
+回显说明，已经打开了两个session，id分别是4、3，此sessionid是本机的softbus_server分配的，后续发送消息需要用到该id
+```
+conDevices
+12-11 20:18:58.350 2780335 2780335 I A0fffe/SOFTBUS_DEMO: [SOFTBUS_DEMO]::PrintConnectedDevicesInfo: sessionId:4, networkId: 3c95f61941b81c48ecd73fef881262b82fcbc58e9b1f545e2097b0dc6fecea37
+12-11 20:18:58.350 2780335 2780335 I A0fffe/SOFTBUS_DEMO: [SOFTBUS_DEMO]::PrintConnectedDevicesInfo: sessionId:3, networkId: 3c95f61941b81c48ecd73fef881262b82fcbc58e9b1f545e2097b0dc6fecea37
+```
+
+9. 设备B发送使用“session 4”消息至设备A的client
+```
+send 4 "hello4"
+12-11 20:19:14.975 2780335 2780335 I C015c0/dsoftbus: [TRAN]SendBytes: sessionId=4
+```
+观察设备A中哪个client有回显，说明设备B使用session 4与该client通信，同理可以使用session 3发送消息至另一个client
+
+10. 设备A容器中client发送使用消息至设备B的client，查看打开的session id
+```
+conDevices
+12-11 20:25:48.995 344047 344047 I A0fffe/SOFTBUS_DEMO: [SOFTBUS_DEMO]::PrintConnectedDevicesInfo: sessionId:1, networkId: e69eab4e2d657264dfbb2006fdfa15524f4a27edeff0baa26d5d2a2b9502f300
+```
+说明使用session 1通信
+
+11. 发送消息测试，在设备B中接受到该字段说明消息接收成功
+```
+send 1 "hello1"
+```
+
+12. 设备A物理机上client发送使用消息至设备B的client，查看打开的session id
+```
+conDevices
+12-11 20:37:24.823 3512580 3512580 I A0fffe/SOFTBUS_DEMO: [SOFTBUS_DEMO]::PrintConnectedDevicesInfo: sessionId:1, networkId: e69eab4e2d657264dfbb2006fdfa15524f4a27edeff0baa26d5d2a2b9502f300
+```
+说明使用session 1通信
+
+13. 发送消息测试，在设备B中接受到该字段说明消息接收成功
+```
+send 1 "hello1"
+```
+
+#### session id 说明
+
+在上个章节的测试中，发现两个client之间通信使用的session id不一样。原因是session id是本机server分配的，只需要在本机范围内互斥。同样容器与虚机也做了session name，group name的隔离，所以本机容器与虚机上client的session id是一致的
+
