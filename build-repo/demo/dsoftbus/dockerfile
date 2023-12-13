@@ -1,0 +1,2 @@
+FROM openeuler-22.03-lts-sp2
+COPY softbus_client /home

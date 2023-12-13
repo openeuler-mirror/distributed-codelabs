@@ -8,8 +8,11 @@
 
 #include <sstream>
 #include <functional>
+#include <fstream>
 #include <thread>
 #include <chrono>
+#include <stdlib.h>
+#include <time.h>
 
 #ifdef  ACCESS_TOKEN
 #include "nativetoken_kit.h"
@@ -42,6 +45,9 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel() {
             MY_LOGE("Failed to %s, ret = %d", __func__, ret); \
         } \
     } while (0)
+
+#define SESSION_ID_FILE "/etc/SI"
+#define SESSION_ID_LEN 65
 
 const std::string PACKAGE_NAME = "softbus_sample";
 const std::string LOCAL_SESSION_NAME = "session_test";
@@ -89,13 +95,35 @@ static void DeviceFoundCallback(const DeviceInfo *device)
 }
 
 SoftbusAdapter::SoftbusAdapter()
-    : _packName(PACKAGE_NAME),
-      _sessionName(LOCAL_SESSION_NAME),
-      _capability(DEFAULT_CAPABILITY),
-      _sessionGroup(DEFAULT_SESSION_GROUP),
-      _publishId(DEFAULT_PUBLISH_ID)
 {
-    
+    _capability = DEFAULT_CAPABILITY;
+    std::ifstream fin;
+    fin.open(SESSION_ID_FILE, std::ios::in);
+    if (!fin.is_open()) {
+        MY_LOGE("file %s open failed", SESSION_ID_FILE);
+        _packName = PACKAGE_NAME;
+        _sessionName = LOCAL_SESSION_NAME;
+        _sessionGroup = DEFAULT_SESSION_GROUP;
+        _publishId = DEFAULT_PUBLISH_ID;
+        fin.close();
+        return;
+    }
+    char si[SESSION_ID_LEN] = {0};
+    fin >> si;
+    MY_LOGE("file %s read %s", SESSION_ID_FILE, si);
+    _packName = si;
+    _sessionName = si;
+    _sessionGroup = si;
+    _publishId = GetRandPublishID();
+    fin.close();
+}
+
+int SoftbusAdapter::GetRandPublishID() {
+    int publishId;
+    srand((unsigned)time(nullptr));
+    publishId = SESSION_ID_LEN * 2 + rand() % SESSION_ID_LEN;
+    MY_LOGE("_publishId %d", publishId);
+    return publishId;
 }
 
 SoftbusAdapter::~SoftbusAdapter()
@@ -308,7 +336,7 @@ int SoftbusAdapter::CreateSessionServerAdapt(ISessionListener *cb)
                     MY_LOGE("Session %d opened failed, ret is %d.", sessionId, result);
                     return result;
                 }
-                MY_LOGI("Session %d opened, ret is %d.", sessionId, result);
+                MY_LOGI("Sessionid [%d] opened, ret is %d.", sessionId, result);
                 char *networkId = new char[DISC_MAX_DEVICE_ID_LEN];
                 if (GetPeerDeviceId(sessionId, networkId, DISC_MAX_DEVICE_ID_LEN) == SOFTBUS_OK) {
                     MY_LOGI("Success get peer(%s) device id.", networkId);

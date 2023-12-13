@@ -5,11 +5,42 @@
 
 const std::string TARGET_SESSION_NAME = "session_test";
 
+void printUsage() {
+    std::string usage = "\
+\n\
+\n\
+Usage:\
+\n\
+\n\
+usage                                 usage\n\
+openAll/openA                         打开所有设备连接\n\
+open <netId>                          打开指定设备连接\n\
+openWS <netId> <sessionName>          打开指定session连接\n\
+openStream/openS <netId>              打开指定设备流连接\n\
+openFile/openF <netId>                打开指定设备文件连接\n\
+close <netId>                         关闭指定设备连接\n\
+sendAll/sendA <str>                   向所有已打开连接的设备发送字符串消息\n\
+sendAllS/sendAS <str>                 向所有已打开连接的设备发送流消息\n\
+send <sessionId> <str>                向指定sessionID发送字符串消息\n\
+sendStream/sendS <sessionId> <str>    向指定sessionID发送流消息\n\
+sendFile/sendF <sessionId> <file>     向指定sessionID发送文件\n\
+allDevices/aD                         查看局域网中所有设备信息\n\
+conDevices                            查看局域网中所有已连接的设备信息\n\
+localNetId                            查看本机net id\n\
+netId <sessionId>                     查看打开了sessionid设备的netID\n\
+ip <netId>                            查看指定设备(netId)的IP\n\
+quit                                  本机退出组网\
+\n\
+\n\
+";
+    std::cout << usage << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
     SoftbusAdapter adpter;
     adpter.Init();
-
+    printUsage();
     std::string input;
     while (std::getline(std::cin, input)) {
         std::string cmd;
@@ -17,6 +48,14 @@ int main(int argc, char const *argv[])
         iss >> cmd;
         if (cmd == "openAll" || cmd == "openA") {
             adpter.OpenSessionWithAllDevice();
+        } else if (cmd == "usage") {
+            printUsage();
+        } else if (cmd == "openWithSessionName") {
+            std::string peerNetId;
+            iss >> peerNetId;
+            std::string sessionName;
+            iss >> sessionName;
+            adpter.OpenSessionAdapt(peerNetId.c_str(), sessionName.c_str(), TYPE_BYTES);
         } else if (cmd == "open") {
             std::string peerNetId;
             iss >> peerNetId;
