@@ -1,0 +1,27 @@
+#!/bin/bash
+# Copyright (c) 2022 Huawei Technologies Co., Ltd
+#
+# This software is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#
+# http://license.coscl.org.cn/MulanPSL2
+#
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+set -e
+# ensure $HOME exists and is accessible by group 0 (we don't know what the runtime UID will be)
+chown -R "${USER_UID}":"${GROUP_ID}" "${HOME}"
+
+# runtime user will need to be able to self-insert in /etc/passwd
+if [ -w /etc/passwd ]; then
+  echo "${USER_NAME}:x:${USER_UID}:${GROUP_ID}:${USER_NAME}:${HOME}:/sbin/nologin" >> /etc/passwd
+fi
+
+# no need for this script to remain in the image after running
+rm "$0"
+
+exit 0

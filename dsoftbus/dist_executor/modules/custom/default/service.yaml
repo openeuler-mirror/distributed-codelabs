@@ -1,0 +1,12 @@
+service: default
+kind: yrlib
+description: this is a func service
+functions:
+  func:
+    storageType: local
+    codePath: /home
+    handler: ""
+    runtime: python3.9
+    memory: 500
+    timeout: 900
+    cpu: 1000

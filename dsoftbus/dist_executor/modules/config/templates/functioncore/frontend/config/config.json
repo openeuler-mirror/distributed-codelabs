@@ -1,0 +1,67 @@
+{
+  "etcd": {
+    "servers": [
+      "{{ETCD_ADDR}}"
+    ],
+    "user": "{{ETCD_USER}}",
+    "password": "{{ETCD_PASSWORD}}",
+    "sslEnable": false
+  },
+  "worker-manager": [
+    {
+      "host": "{{WORKERMGR_IP}}",
+      "port": "{{WORKERMGR_SVC_PORT}}",
+      "zone": "defaultaz"
+    }
+  ],
+  "http": {
+    "resptimeout": 43200,
+    "workerInstanceReadTimeOut": 43200,
+    "maxRequestBodySize": 6
+  },
+  "metricsEnable": false,
+  "slaQuota": 100,
+  "backpressureDisable": false,
+  "trafficLimitDisable": false,
+  "httpsConfig": {
+    "httpsEnable": false,
+    "tlsProtocol": "TLSv1.2",
+    "tlsCiphers": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+  },
+  "retry": {
+    "instanceExceptionRetry": true
+  },
+  "metricsConfig": {
+    "metricsport": "9099",
+    "metricspath": "/metrics"
+  },
+  "runtime": {
+    "host": "0.0.0.0",
+    "port": "{{FRONTEND_HTTP_PORT}}",
+    "http2port": "{{FRONTEND_HTTP2_PORT}}",
+    "grpcport": "{{FRONTEND_GRPC_PORT}}",
+    "azkey": "KUBERNETES_IO_AVAILABLEZONE",
+    "protocol": "http",
+    "priority": {
+      "default": 5
+    }
+  },
+  "trafficLimitParams": {
+    "instanceLimitRate": 20000,
+    "instanceBucketSize": 40000,
+    "funcLimitRate": 2000,
+    "funcBucketSize": 4000
+  },
+  "invokeLimit": {
+    "enable": false,
+    "tokenBucketSize": 1000,
+    "frequency": 1
+  },
+  "functionNameSeparator": "-",
+  "functionCapability": 2,
+  "usrReqAuthTimeout": 5,
+  "servicesPath": "{{SERVICES_PATH}}",
+  "schedule": {
+    "policy": 2
+  }
+}

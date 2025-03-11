@@ -1,0 +1,23 @@
+{
+    "secretEncryptKey": {
+        "keys": {
+            "key": "da1352391c6d54eed9de4d02:1a5cfba5caed9b96114834c3dbd760192acc82af4d2aa462768ddfd5da129311f27d9e34f097086736a6802f9937b10e9cf9c58da9105e76ca6f72ddd903ee34d7de0b385fb9166a03a2666525dced74",
+            "mac": "cc299f4651f30fc24235c88ae8a041a8c2972a1d0070c030ed89fc552ede1c09"
+        },
+        "description": "secretEncryptKey"
+    },
+    "app-key": {
+        "keys": {
+            "key": "37acf134aaee66d19213c31a:cda713aa2eb2f80deb63c96d69c15b3b6c7276683a3b55cfe1d15a375d2b1cafbd3cd2024eabf11684a8c8b14091972a824838a1ae122af3a3c141397c55c1d0061cb2eef98faaaa67d6bdcdeb72664b",
+            "mac": "dfaaf5a186aca5603b20be97e8540d336c35fe775546841244cded6da1638efd"
+        },
+        "description": "app-key"
+    },
+    "config-key": {
+        "keys": {
+            "key": "7014223f0a628977b983c4b4:10516a0fa6f4df5d1884ccb61404a6439dc9024a97dd070e2e26dbaafd07ba8fcf87ed2f49cf4a8bd5a191a3d50db45cfb2fbc0c0524f85f2a6ab4c6074294b2ac299bc63526f8a943c1629618f94ed6",
+            "mac": "24b8a400b978f712ba6a7805fae67d99725c7df2a77707d0b7e3decd862fb3bc"
+        },
+        "description": "config-key"
+    }
+}

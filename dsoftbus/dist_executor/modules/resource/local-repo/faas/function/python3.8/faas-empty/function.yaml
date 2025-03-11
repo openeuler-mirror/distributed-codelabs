@@ -1,0 +1,7 @@
+runtime: python3.8
+handler: handler.my_handler
+initializer: handler.init
+description: empty function
+memory: 500
+cpu: 500
+timeout: 900

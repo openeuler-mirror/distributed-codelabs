@@ -1,0 +1,27 @@
+{
+  "serverUrl": {
+    "nextPath": "/v1/runtime/invocation/request",
+    "responsePath": "/v1/runtime/invocation/response/{request_id}",
+    "errorPath": "/v1/runtime/invocation/error/{request_id}"
+  },
+  "serverHeaders": {
+    "headerInvokeIDKey": "X-Cff-Request-Id",
+    "headerAccessKey": "X-CFF-Access-Key",
+    "headerSecretKey ": "X-CFF-Secret-Key",
+    "headerAuthToken": "X-CFF-Auth-Token",
+    "headerSecurityToken": "X-CFF-Security-Token"
+  },
+  "serverEnvKey": {
+    "runtimeProject": "RUNTIME_PROJECT_ID",
+    "runtimeFuncName": "RUNTIME_FUNC_NAME",
+    "runtimeFuncVersion ": "RUNTIME_FUNC_VERSION",
+    "runtimePackage": "RUNTIME_PACKAGE",
+    "runtimeTime": "RUNTIME_TIMEOUT",
+    "runtimeHandler": "RUNTIME_HANDLER",
+    "runtimeUserData": "RUNTIME_USERDATA",
+    "runtimeCPU ": "RUNTIME_CPU",
+    "runtimeMemory": "RUNTIME_MEMORY",
+    "runtimeCodeRoot": "RUNTIME_CODE_ROOT",
+    "runtimeApiAddr": "RUNTIME_API_ADDR"
+  }
+}

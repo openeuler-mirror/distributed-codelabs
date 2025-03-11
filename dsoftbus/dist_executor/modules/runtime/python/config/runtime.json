@@ -1,0 +1,6 @@
+{
+    "maxRequestBodySize": 6,
+    "maxHandlerNum": 1024,
+    "maxProcessNum": 1024,
+    "dataSystemConnectionTimeout": 0.15
+}

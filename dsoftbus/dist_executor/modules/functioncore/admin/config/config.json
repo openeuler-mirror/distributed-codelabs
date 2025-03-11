@@ -1,0 +1,61 @@
+{
+    "service": {
+        "function_accessor": {
+            "addr": "",
+            "api_version": "/serverless/v1",
+            "timeout": 86400
+        },
+        "function_repo": {
+            "addr": "http://{local_ip}:{repo_port}",
+            "api_version": "/function-repository/v1",
+            "timeout": 86400
+        },
+        "metrics": {
+            "addr": "",
+            "api_version": "/api/v1",
+            "timeout": 30
+        },
+        "logger": {
+            "addr": "http://{loki_ip}:{loki_port}",
+            "api_version": "/loki/api/v1",
+            "max_size": 1000,
+            "timeout": 30,
+            "tls_enable": false
+        },
+        "instance_manager": {
+            "addr": "http://{local_ip}:{workermgr_listen_port}",
+            "api_version": "/worker-manager/v1",
+            "timeout": 30
+        }
+    },
+    "server": {
+        "port": {admin_port},
+        "read_timeout": 86400,
+        "write_timeout": 86400,
+        "body_limit": "250MB",
+        "https_enable": false,
+        "key_file": "{install_dir}/resource/tls/tls.key",
+        "cert_file": "{install_dir}/resource/tls/tls.crt"
+    },
+    "rate_limit": {
+        "login_weight": 0,
+        "logout_weight": 0,
+        "create_weight": 0,
+        "delete_weight": 0,
+        "update_weight": 0,
+        "query_weight": 0,
+        "invoke_weight": 0,
+        "log_query_weight": 0,
+        "daily_token_of_tenant": 10000,
+        "concurrent_token_of_tenant": 10000,
+        "total_concurrent_token": 100000
+    },
+    "invokeLimit": {
+        "enable": false,
+        "tokenBucketSize": 1000,
+        "frequency": 1
+    },
+    "auth_enable": false,
+    "cli_version": "2.0.0.B183.20220210125433",
+    "upload_absolute_path": "{upload_absolute_path}"
+}

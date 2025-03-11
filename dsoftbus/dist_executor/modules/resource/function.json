@@ -1,0 +1,29 @@
+{
+  "runtime": [
+    "nodejs10.15.2",
+    "java1.8",
+    "python3.7",
+    "python3.8",
+    "python3.9",
+    "cpp11",
+    "custom-runtime",
+    "posix-custom-runtime",
+    "go1.13"
+  ],
+  "deploymentInfo": [
+    {
+      "cpu": 500,
+      "memory": 500
+    },
+    {
+      "cpu": 1500,
+      "memory": 3000
+    },
+    {
+      "cpu": 4000,
+      "memory": 16000
+    }
+  ],
+  "maxMaxInstance": 1000,
+  "maxLayersSize": 5
+}

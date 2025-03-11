@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<config>
+    <!-- local ip, required -->
+    <local_ip>IP</local_ip>
+
+    <!-- master ip, required -->
+    <master_ip>IP</master_ip>
+
+    <!-- state storage type: redis -->
+    <state_storage_type>redis</state_storage_type>
+    <!-- redis ip -->
+    <redis_ip>IP</redis_ip>
+    <!-- redis_port -->
+    <redis_port>6379</redis_port>
+    <!-- redis password -->
+    <redis_password>password</redis_password>
+
+    <!-- S3 accessKey -->
+    <S3_AK>accessKey</S3_AK>
+    <!-- S3 secretKey -->
+    <S3_SK>secretKey</S3_SK>
+
+    <!-- function storage type: s3 -->
+    <function_storage_type>s3</function_storage_type>
+    <!-- minio ip -->
+    <minio_ip>IP</minio_ip>
+    <!-- minio port -->
+    <minio_port>19002</minio_port>
+    <!-- minio console address port-->
+    <minio_console_port>19001</minio_console_port>
+
+    <!-- etcd ip -->
+    <etcd_ip>IP</etcd_ip>
+    <!-- etcd authorization type (Noauth, TLS, PWD)  -->
+    <etcd_auth_type>PWD</etcd_auth_type>
+    <!-- core_etcd password of user root -->
+    <etcd_password>password</etcd_password>
+    <!-- etcd port -->
+    <etcd_port>32379</etcd_port>
+    <!-- etcd peer port, listen other etcd message in cluster-->
+    <etcd_peer_port>32380</etcd_peer_port>
+    <!-- etcdctl install dir -->
+    <etcdctl_install_dir>~/mindpandas</etcdctl_install_dir>
+    <!-- if tls enabled, following item should be config correctly -->
+    <!-- certificate used for SSL/TLS config to core_etcd server-->
+    <etcd_cert_file>path_to_cert</etcd_cert_file>
+    <!-- key for the certificate -->
+    <etcd_key_file>path_to_key</etcd_key_file>
+    <!--  trusted certificate authority -->
+    <etcd_ca_file>path_to_ca</etcd_ca_file>
+    <!-- certificate used for SSL/TLS config to proxy connect to core_etcd-->
+    <client_cert_file>path_to_client_cert</client_cert_file>
+    <!-- key for the certificate -->
+    <client_key_file>path_to_client_key</client_key_file>
+    <!-- WARNING: set etcd_no_fsync true will improve I/O performance, but might cause data lose when node crashed -->
+    <etcd_no_fsync>false</etcd_no_fsync>
+
+    <!-- data system master listening port -->
+    <ds_master_port>12123</ds_master_port>
+    <!-- ds worker port -->
+    <ds_worker_port>31501</ds_worker_port>
+    <!-- ds agent port -->
+    <ds_agent_port>31502</ds_agent_port>
+
+    <!-- admin service http listen port -->
+    <admin_port>31172</admin_port>
+    <!-- iam-adaptor http listen port -->
+    <iam_port>35556</iam_port>
+    <!-- function-repo http listen port port -->
+    <function_repo_port>35557</function_repo_port>
+    <!-- worker manager service http listen port -->
+    <workermgr_listen_port>58866</workermgr_listen_port>
+    <!-- global schedule port -->
+    <global_scheduler_port>22770</global_scheduler_port>
+    <!-- proxy tcp port -->
+    <proxy_tcp_port>21001</proxy_tcp_port>
+    <!-- proxy http port -->
+    <proxy_http_port>21002</proxy_http_port>
+    <!-- proxy grpc port -->
+    <proxy_grpc_port>21003</proxy_grpc_port>
+    <!-- runtime mgr port -->
+    <runtime_mgr_port>21005</runtime_mgr_port>
+    <!-- runtime init port -->
+    <runtime_init_port>21006</runtime_init_port>
+    <!-- worker http port -->
+    <worker_http_port>21007</worker_http_port>
+    <!-- worker tcp port -->
+    <worker_tcp_port>21008</worker_tcp_port>
+    <!-- worker agent port -->
+    <worker_agent_port>21009</worker_agent_port>
+    <!-- frontend http port -->
+    <frontend_http_port>31220</frontend_http_port>
+    <!-- frontend http2 port -->
+    <frontend_http2_port>31221</frontend_http2_port>
+    <!-- frontend grpc port -->
+    <frontend_grpc_port>21011</frontend_grpc_port>
+
+    <!-- log level: INFO DEBUG -->
+    <log_level>INFO</log_level>
+</config>

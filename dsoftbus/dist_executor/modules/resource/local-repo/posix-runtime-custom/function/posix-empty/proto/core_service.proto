@@ -1,0 +1,151 @@
+/*
+ * Copyright (c) 2022 Huawei Technologies Co., Ltd
+ *
+ * This software is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *
+ * http://license.coscl.org.cn/MulanPSL2
+ *
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package core_service;
+
+import "common.proto";
+
+option go_package = "grpc/pb/core;core";
+
+// Core service provides APIs to runtime,
+service CoreService {
+  // Create an instance for specify function
+  rpc Create (CreateRequest) returns (CreateResponse) {}
+  // invoke the created instance
+  rpc Invoke (InvokeRequest) returns (InvokeResponse) {}
+  // terminate the created instance
+  rpc Terminate (TerminateRequest) returns (TerminateResponse) {}
+  // exit the created instance
+  rpc Exit (ExitRequest) returns (ExitResponse) {}
+  // save state of the created instance
+  rpc SaveState (StateSaveRequest) returns (StateSaveResponse) {}
+  // load state of the created instance
+  rpc LoadState (StateLoadRequest) returns (StateLoadResponse) {}
+  // Kill the signal to instance
+  rpc Kill (KillRequest) returns (KillResponse) {}
+}
+
+enum AffinityType {
+  PreferredAffinity     = 0;
+  PreferredAntiAffinity = 1;
+  RequiredAffinity      = 2;
+  RequiredAntiAffinity  = 3;
+}
+
+message SchedulingOptions {
+  int32               priority        = 1;
+  map<string, double> resources       = 2;
+  map<string, string> extension       = 3;
+  map<string, AffinityType> affinity  = 4;
+}
+
+message CreateRequest {
+  string              function      = 1;
+  repeated common.Arg args          = 2;
+  SchedulingOptions   schedulingOps = 3;
+  string              requestID     = 4;
+  string              traceID       = 5;
+  repeated string     labels        = 6;
+  // optional. if designated instanceID is not empty, the created instance id will be assigned designatedInstanceID
+  string			 designatedInstanceID = 7;
+  map<string, string> createOptions = 8;
+}
+
+message CreateResponse {
+  common.ErrorCode code       = 1;
+  string           message    = 2;
+  string           instanceID = 3;
+}
+
+message InvokeRequest {
+  string              function         = 1;
+  repeated common.Arg args             = 2;
+  string              instanceID       = 3;
+  string              requestID        = 4;
+  string              traceID          = 5;
+  repeated string     returnObjectIDs  = 6;
+}
+
+message InvokeResponse {
+  common.ErrorCode code           = 1;
+  string           message        = 2;
+  string           returnObjectID = 3;
+}
+
+message CallResult {
+  common.ErrorCode code           = 1;
+  string           message        = 2;
+  string           instanceID     = 3;
+  string           requestID      = 4;
+  HttpTriggerResponse  triggerResponse               = 5;
+}
+
+message CallResultAck {
+  common.ErrorCode code           = 1;
+  string           message        = 2;
+}
+
+message TerminateRequest {
+  string instanceID = 1;
+}
+
+message TerminateResponse {
+  common.ErrorCode code    = 1;
+  string           message = 2;
+}
+
+message ExitRequest {}
+
+message ExitResponse {}
+
+message StateSaveRequest {
+  bytes state = 1;
+}
+
+message StateSaveResponse {
+  common.ErrorCode code         = 1;
+  string           message      = 2;
+  string           checkpointID = 3;
+}
+
+message StateLoadRequest {
+  string checkpointID = 1;
+}
+
+message StateLoadResponse {
+  common.ErrorCode code    = 1;
+  string           message = 2;
+  bytes            state   = 3;
+}
+
+message KillRequest {
+  string instanceID = 1;
+  int32  signal     = 2;
+  bytes  payload    = 3;
+}
+
+message KillResponse {
+  common.ErrorCode code    = 1;
+  string           message = 2;
+}
+
+message HttpTriggerResponse {
+  int32  statusCode                = 1;
+  string contentType               = 2;
+  bytes  body                      = 3;
+  map<string, string> headers      = 4;
+}

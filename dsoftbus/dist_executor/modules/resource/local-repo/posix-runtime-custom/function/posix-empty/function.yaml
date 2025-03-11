@@ -1,0 +1,5 @@
+runtime: posix-custom-runtime
+description: empty function
+memory: 500
+cpu: 500
+timeout: 900

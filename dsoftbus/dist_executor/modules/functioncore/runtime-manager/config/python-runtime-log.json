@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "extra": {
+      "format": "[%(asctime)s %(levelname)s %(filename)s:%(lineno)d] [%(podname)s %(thread)d] %(message)s"
+    }
+  },
+  "handlers": {
+    "file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "filename": "{{LOG_PATH}}",
+      "formatter": "extra",
+      "maxBytes": 419430400,
+      "backupCount": 1
+    }
+  },
+  "loggers": {
+    "FileLogger": {
+      "handlers": [
+        "file"
+      ],
+      "level": "{{logLevel}}"
+    }
+  }
+}

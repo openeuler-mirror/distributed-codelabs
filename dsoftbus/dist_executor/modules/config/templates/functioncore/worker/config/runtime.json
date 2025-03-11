@@ -1,0 +1,5 @@
+{
+    "maxRequestBodySize": "6",
+    "maxFdNum": 65535,
+    "dataSystemConnectionTimeout": "1"
+}

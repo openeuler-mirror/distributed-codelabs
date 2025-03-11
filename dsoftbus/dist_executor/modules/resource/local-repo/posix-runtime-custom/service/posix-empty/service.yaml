@@ -1,0 +1,3 @@
+service: empty
+kind: posix-runtime-custom
+description: this is a empty service

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<config>
+    <!--deploy path, required -->
+    <deploy_path>/opt</deploy_path>
+    <!-- local ip, required -->
+    <local_ip>IP</local_ip>
+    <!-- state storage type: local redis -->
+    <state_storage_type>local</state_storage_type>
+    <!-- function storage type: local -->
+    <function_storage_type>local</function_storage_type>
+
+    <!-- redis ip -->
+    <redis_ip>IP</redis_ip>
+    <!-- redis_port -->
+    <redis_port>6379</redis_port>
+    <!-- redis password -->
+    <redis_password>password</redis_password>
+
+    <!-- S3 accessKey -->
+    <S3_AK>accessKey</S3_AK>
+    <!-- S3 secretKey -->
+    <S3_SK>secretKey</S3_SK>
+
+    <!-- minio ip -->
+    <minio_ip>IP</minio_ip>
+    <!-- minio port -->
+    <minio_port>19002</minio_port>
+    <!-- minio console address port-->
+    <minio_console_port>19001</minio_console_port>
+
+    <!-- etcd ip -->
+    <etcd_ip>IP</etcd_ip>
+    <!-- etcd authorization type (Noauth, TLS)  -->
+    <etcd_auth_type>Noauth</etcd_auth_type>
+    <!-- etcd port -->
+    <etcd_port>32379</etcd_port>
+    <!-- etcd peer port, listen other etcd message in cluster-->
+    <etcd_peer_port>32380</etcd_peer_port>
+    <!-- etcdctl install dir -->
+    <etcdctl_install_dir>/usr/bin</etcdctl_install_dir>
+
+    <!-- if tls enabled, following item should be config correctly -->
+    <!-- certificate used for SSL/TLS config to core_etcd server-->
+    <etcd_cert_file>path_to_cert</etcd_cert_file>
+    <!-- key for the certificate -->
+    <etcd_key_file>path_to_key</etcd_key_file>
+    <!--  trusted certificate authority -->
+    <etcd_ca_file>path_to_ca</etcd_ca_file>
+
+    <!-- etcd proxy enable -->
+    <etcd_proxy_enable>false</etcd_proxy_enable>
+    <!-- certificate used for SSL/TLS config to proxy connect to core_etcd-->
+    <client_cert_file>path_to_client_cert</client_cert_file>
+    <!-- key for the certificate -->
+    <client_key_file>path_to_client_key</client_key_file>
+    <!-- while proxy is enabled, etcd_proxy_nums of etcd proxy will be starting-->
+    <etcd_proxy_nums>0</etcd_proxy_nums>
+    <!-- if proxy enabled, make sure the etcd proxy is already started, and following item should be config correctly -->
+    <!-- specify proxy endpoints-->
+    <etcd_proxy_ports>23790</etcd_proxy_ports>
+    <!-- WARNING: set etcd_no_fsync true will improve I/O performance, but might cause data lose when node crashed -->
+    <etcd_no_fsync>false</etcd_no_fsync>
+
+    <!-- worker manager service http listen port -->
+    <workermgr_listen_port>58866</workermgr_listen_port>
+
+    <!-- global schedule port -->
+    <global_scheduler_port>22770</global_scheduler_port>
+
+    <!-- data system master ip -->
+    <ds_master_ip>IP</ds_master_ip>
+    <!-- data system master listening port -->
+    <ds_master_port>12123</ds_master_port>
+    <spill_enable>false</spill_enable>
+    <!-- 默认写入部署路径 -->
+    <spill_directory>default</spill_directory>
+    <!-- 默认20G，单位：MB -->
+    <spill_size_limit>20480</spill_size_limit>
+
+    <!-- log level: INFO DEBUG -->
+    <log_level>INFO</log_level>
+    <runtime_log_level>INFO</runtime_log_level>
+    <functioncore_log_path>default</functioncore_log_path>
+    <runtime_log_path>default</runtime_log_path>
+
+    <!-- auto load function path -->
+    <services_path>/home/sn/config/services.yaml</services_path>
+
+    <status_collect_enable>false</status_collect_enable>
+    <status_collect_interval>300</status_collect_interval>
+</config>

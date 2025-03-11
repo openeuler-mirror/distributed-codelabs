@@ -1,0 +1,186 @@
+#!/bin/bash
+# Copyright (c) 2022 Huawei Technologies Co., Ltd
+#
+# This software is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#
+# http://license.coscl.org.cn/MulanPSL2
+#
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+set -e
+
+BASE_DIR=$(
+    cd "$(dirname "$0")"
+    pwd
+)
+
+. "${BASE_DIR}"/utils.sh
+
+function stop_admin_service() {
+    local pid=$(ps -ef | grep "admin/bin/distribute-executor --module admin-service" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop admin-service"
+    fi
+    return 0
+}
+
+function stop_function_repo() {
+    local pid=$(ps -ef | grep "function-repo/bin/distribute-executor --module function-repo" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to function repo"
+    fi
+    return 0
+}
+
+function stop_worker_manager() {
+    local pid=$(ps -ef | grep "worker-manager/bin/distribute-executor --module worker-manager" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop worker-manager"
+    fi
+    return 0
+}
+
+function stop_frontend() {
+    local pid=$(ps -ef | grep "frontend/bin/distribute-executor --module frontend" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop frontend"
+    fi
+    return 0
+}
+
+function stop_dsmaster() {
+    local pid=$(ps -ef | grep "datasystem/service/master" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop datasystem master"
+    fi
+    return 0
+}
+
+function stop_ds_agent() {
+    local pid=$(ps -ef | grep "datasystem/service/agent" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop datasystem agent"
+    fi
+    return 0
+}
+
+function stop_bus_proxy() {
+    local pid=$(ps -ef | grep "functiontask/bin/distribute-executor --module functiontask" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 ${pid}; then
+        log_warning "failed to stop busproxy"
+    fi
+    return 0
+}
+
+function stop_runtime_mgr() {
+    local pid=$(ps -ef | grep "runtime-manager/bin/distribute-executor --module runtime-manager" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    runtime_pid=$(ps -ef | awk -v ppid="$pid" '{if($3==$ppid) print $1}')
+    if [ -n "$runtime_pid" ]; then
+        if ! kill -9 ${runtime_pid}; then
+            log_warning "failed to stop runtime"
+        fi
+    fi
+    if ! kill -9 ${pid}; then
+        log_warning "failed to stop runtime-manager"
+    fi
+    return 0
+}
+
+function stop_worker() {
+    local pid=$(ps -ef | grep "worker/bin/distribute-executor --module worker" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop worker"
+    fi
+    return 0
+}
+
+function stop_ds_worker() {
+    local pid=$(ps -ef | grep "datasystem/service/worker" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop datasystem worker"
+    fi
+    return 0
+}
+
+function stop_runtime() {
+    local runtime_key="dist_executor/modules/runtime/python/fnruntime/server.py"
+    local pids=$(ps -ef | grep "$runtime_key" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pids" ] && return 0
+    for pid in ${pids[@]}
+    do
+        if ! kill -9 "${pid}"; then
+            log_warning "failed to stop runtime"
+        fi
+    done
+    return 0
+}
+
+function remove_distribute_executor() {
+    local MODULE_LIST=$(ls -l "${BASE_DIR}"/../functioncore | awk '/^d/ {print $NF}')
+    for module in ${MODULE_LIST[@]}
+    do
+        local path="${BASE_DIR}/../functioncore/${module}/bin/distribute-executor"
+        [ -f "$path" ] && rm "$path"
+    done
+    return 0
+}
+
+function remove_extra_yrlib_handler() {
+    local helloworld="${BASE_DIR}/../resource/local-repo/yrlib/service/python3.9/yrlib-hello/helloworld/yrlib_handler.py"
+    local helloclass="${BASE_DIR}/../resource/local-repo/yrlib/service/python3.9/yrlib-class/helloclass/yrlib_handler.py"
+    local defaultfunc="${BASE_DIR}/../custom/default/func/yrlib_handler.py"
+    local demo_pycache="${BASE_DIR}/../custom/default/func/__pycache__/yrlib_handler.cpython-38.pyc"
+
+    [ -f "$helloworld" ] && rm "$helloworld"
+    [ -f "$helloclass" ] && rm "$helloclass"
+    [ -f "$defaultfunc" ] && rm "$defaultfunc"
+    [ -f "$demo_pycache" ] && rm "$demo_pycache"
+    return 0
+}
+
+function remove_datasystem_rocksdb() {
+    local rocksdb="${BASE_DIR}/../datasystem/rocksdb"
+    [ -d "$rocksdb" ] && rm -r "$rocksdb"
+    return 0
+}
+
+function main() {
+    stop_admin_service
+    stop_function_repo
+    stop_worker_manager
+    stop_frontend
+    stop_dsmaster
+    stop_ds_agent
+    stop_bus_proxy
+    stop_runtime_mgr
+    stop_worker
+    stop_ds_worker
+    stop_runtime
+    remove_distribute_executor
+    remove_extra_yrlib_handler
+    remove_datasystem_rocksdb
+
+    local pid=$(ps -ef | grep "start_mp" | grep -v grep | grep -v PPID | grep -v clear.sh | grep -v deploy.sh | awk '{ print $2 }')
+    [ -z "$pid" ] && return 0
+    if ! kill -9 "${pid}"; then
+        log_warning "failed to stop mp"
+    fi
+    log_info "stop mp success"
+}
+
+main

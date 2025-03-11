@@ -1,0 +1,50 @@
+{
+    "invokeLimit": {
+        "enable": false,
+        "tokenBucketSize": 1000,
+        "frequency": 1
+    },
+    "metrics": {
+        "metricsport": "9098",
+        "metricspath": "/metrics",
+        "prometheus_server_address": "http://prometheus-server.monitor:80"
+    },
+    "httpsConfig": {
+       "httpsEnable": false,
+       "tlsProtocol": "TLSv1.2",
+       "tlsCiphers": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+    },
+    "retry": {
+        "instanceExceptionRetry": true
+    },
+    "requestConfig": {
+        "requestWorkerTimeout": 36
+    },
+    "etcd": {
+        "servers": ["{{ETCD_ADDR}}"],
+        "user": "{{ETCD_USER}}",
+        "password": "{{ETCD_PASSWORD}}",
+        "sslEnable": false
+    },
+    "workerManager": {
+        "serviceName": "{{WORKERMGR_IP}}",
+        "port": "{{WORKERMGR_SVC_PORT}}"
+    },
+    "dataSystem": {
+        "enable": true,
+        "workerPort": "31501"
+    },
+    "schedule": {
+        "policy": 2,
+        "forwardScheduleResourceNotEnough": true,
+        "sleepingMemoryThreshold": 0.8,
+        "selectInstanceToSleepingPolicy": "LRU"
+    },
+    "functionCapability": 2,
+    "upgradingTimeout": 900,
+    "forwardLoadBalancePolicy": "roundRobin",
+    "recoverEnable": false,
+    "runtimeHeartbeatInterval": 1000,
+    "runtimeHeartbeatEnable": true,
+    "servicesPath": "{{SERVICES_PATH}}"
+}
