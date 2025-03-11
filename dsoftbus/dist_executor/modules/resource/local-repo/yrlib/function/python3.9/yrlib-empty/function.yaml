@@ -1,0 +1,4 @@
+runtime: python3.9
+memory: 500
+cpu: 500
+timeout: 900

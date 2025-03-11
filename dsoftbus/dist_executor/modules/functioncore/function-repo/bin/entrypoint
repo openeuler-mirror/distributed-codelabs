@@ -1,0 +1,35 @@
+#!/bin/bash
+# Copyright (c) 2022 Huawei Technologies Co., Ltd
+#
+# This software is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#
+# http://license.coscl.org.cn/MulanPSL2
+#
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+set -e
+
+if [ "$(whoami)X" != "${USER_NAME}X" ]; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-sn}:x:$(id -u):$(id -g):${USER_NAME:-sn} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
+fi
+
+cd "${HOME}"/bin || (echo "failed to change directory" && exit 1)
+if ! tar -xf node_modules.tar; then
+  echo "tar node_modules error, trace chain of nodeJS is not functional!"
+fi
+
+# prevent from creating files that have incorrect permission
+umask 0027
+
+if ! exec "${FUNCTIONREPO}" --module function-repo "$@" ;then
+  echo "failed to start function repo $?"
+  exit 1
+fi
+exit 0

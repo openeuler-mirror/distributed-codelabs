@@ -1,0 +1,11 @@
+{
+    "ServerPort": 31530,
+    "portNum": 10000,
+    "retryTimes": 2,
+    "recycleLog": 604800,
+    "runtimeConfigs": {
+            "initial": {
+                "port": 31537
+            }
+    }
+}

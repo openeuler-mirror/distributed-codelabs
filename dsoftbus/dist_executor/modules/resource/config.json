@@ -1,0 +1,21 @@
+{
+  "cliConfig":{
+    "adminService.host":"http://serverlessnative.huawei.com:31172",
+    "userId":"ic4062b8333240acb996cb3cacf99b36",
+    "tenantId": "i1fe539427b24702acc11fbb4e134e17",
+    "caPath": "",
+    "zipFileSizeMaxMB": 300,
+    "unzipFileSizeMaxMB": 600,
+    "mutualTLSConfig":{
+      "tlsEnable": false,
+      "rootCAFile": "",
+      "moduleCertFile": "",
+      "moduleKeyFile": "",
+      "serverName": ""
+    },
+    "securityEnable": true
+  },
+  "cliLimit":{
+    "eventSize": 3670016
+  }
+}

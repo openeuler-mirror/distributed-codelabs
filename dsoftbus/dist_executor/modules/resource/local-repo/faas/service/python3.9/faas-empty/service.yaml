@@ -1,0 +1,3 @@
+service: empty
+kind: faas
+description: this is a empty service

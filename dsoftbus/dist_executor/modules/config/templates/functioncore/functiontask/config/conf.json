@@ -1,0 +1,41 @@
+{
+    "state_server_addr": "{{REDIS_ADDR}}",
+    "state_server_enable_tls": false,
+    "state_server_mode": "single",
+    "state_server_password": "{{REDIS_PASSWORD}}",
+    "http_invoke_port": 8080,
+    "p2p_invoke_port": 8017,
+    "call_timeout": 15,
+    "init_call_timeout": 300,
+    "max_wait_future_cnt": 1000,
+    "resolve_deadlock": true,
+    "persistent_state": true,
+    "persistent_future": true,
+    "init_state_client": true,
+    "max_nums_of_state_id": 10000,
+    "busstorageconfig": {
+        "storagetype": "{{STATE_STORAGE_TYPE}}",
+        "redisclientconfig": {
+            "server_addr": "{{REDIS_ADDR}}",
+            "server_enable_tls": false,
+            "server_mode": "single",
+            "server_password": "{{REDIS_PASSWORD}}"
+        },
+        "s3clientconfig": {
+            "endpoint": "{{S3_ADDR}}",
+            "accessKey": "d06b003f7d8d60c8ac3d7fa8:5cb9bbf58a0b306a7a8c57b0b933f1b08522c41c",
+            "secretKey": "418213bcfc5c5d10e046fbfc:48f48e7562a65ad14aa3031c2af432b289a4a837239bb571801b",
+            "secure": false,
+            "caFile": "/home/sn/module/ca.crt",
+            "presignedUrlExpires": 3600,
+            "timeout": 40,
+            "trustedCA": false
+        }
+    },
+    "future_ttl": 43200,
+    "external_future_ttl": 43200,
+    "redis_max_idle": 16,
+    "redis_max_active": 16,
+    "functionNameSeparator": "-",
+    "functionCapability": 2
+}

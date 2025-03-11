@@ -1,0 +1,695 @@
+#!/bin/bash
+# Copyright (c) 2022 Huawei Technologies Co., Ltd
+#
+# This software is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#
+# http://license.coscl.org.cn/MulanPSL2
+#
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+set -e
+
+BASE_DIR=$(
+    cd "$(dirname "$0")"
+    pwd
+)
+
+ulimit -u 10240
+
+export YR_BARE_MENTAL=1
+# limit the fd consumption
+export GOMAXPROCS=16
+
+[[ ! -f "${BASE_DIR}/utils.sh" ]] && echo "${BASE_DIR}/utils.sh is not exist" && exit 1
+. ${BASE_DIR}/utils.sh
+
+unset http_proxy
+unset https_proxy
+
+# installation directory is the mandatory script input parameter
+INSTALL_DIR=$(readlink -f "${BASE_DIR}/..")
+CONFIG_FILE="${BASE_DIR}/../config/config.xml"
+LOG_LEVEL="INFO"
+ENABLE_DS_AGENT=OFF
+ENABLE_FRONTEND=OFF
+REALTIME_LOGS=false
+ENABLE_SCHEDULER=false
+LOG_DIR=~/mindpandas/log
+
+# identifier assignment
+HOST_IP=$(hostname -I | awk '{print $1}')
+NODE_ID="$(hostname)-${RANDOM}"
+DATA_PLANE_PORT_MIN=20000
+DATA_PLANE_PORT_MAX=25000
+
+# shellcheck disable=SC2002
+TCP_CLIENT_MIN=$(cat /proc/sys/net/ipv4/ip_local_port_range | awk '{print $1}')
+RUNTIME_MIN_PORT=$((TCP_CLIENT_MIN - 2000))
+RUNTIME_MAX_PORT=$((TCP_CLIENT_MIN - 1000))
+
+# address assignment
+PROXY_TCP_PORT=21001
+PROXY_HTTP_PORT=21002
+PROXY_GRPC_PORT=21003
+
+RUNTIME_MGR_PORT=21005
+# runtime manager will check whether the port is available
+RUNTIME_INIT_PORT=21006
+
+WORKER_HTTP_PORT=21007
+WORKER_TCP_PORT=21008
+WORKER_AGENT_PORT=21009
+
+FRONTEND_HTTP_PORT=31220
+FRONTEND_HTTP2_PORT=31221
+FRONTEND_GRPC_PORT=21011
+
+SPILL_PATH=""
+SPILL_SIZE_LIMIT=0
+DS_MASTER_ADDRESS="" # load from config file
+DS_WORKER_PORT=31501
+DS_AGENT_PORT=31502
+GLOBAL_SCHEDULER_PORT=22770
+
+# resource allocation
+# CPU unit: 1/1000 Core, Mem unit: 1 MilliBytes
+CPUALL=0
+MEMALL=0
+CPU4COMP=0
+MEM4COMP=0
+MEM4DATA=0
+ETCD_PASSWORD=""
+REDIS_PASSWORD=""
+MAX_CLIENT_NUM=2000
+
+# belonging process pid
+# shellcheck disable=SC2034
+# shellcheck disable=SC2116
+OWNER_SHELL_ID="$(echo $$)"
+PROXY_PID=""
+WORKER_PID=""
+RUNTIME_MGR_PID=""
+DS_WORKER_PID=""
+DS_AGENT_PID=""
+SOCKET_DIR=~/.datasystem/socket
+TEMPLATE_DIR="${BASE_DIR}"/../config/templates
+# shellcheck disable=SC2012
+MODULE_LIST=$(ls -l "${BASE_DIR}"/../functioncore | awk '/^d/ {print $NF}')
+
+function restore_config() {
+    # restore functioncore config
+    for module_name in ${MODULE_LIST}
+    do
+        src_dir=${TEMPLATE_DIR}/functioncore/${module_name}/config
+        dst_dir="${BASE_DIR}"/../functioncore/${module_name}
+        [ -d "${src_dir}" ] && [ -d "${dst_dir}" ] && cp -rf "${src_dir}" "${dst_dir}"
+    done
+    printf "restore config"
+}
+
+function init_config() {
+    local CONFIG_FILE="${BASE_DIR}/../config/config.xml"
+    [[ ! -f "${CONFIG_FILE}" ]] && echo "${CONFIG_FILE} is not exist" && exit 1
+
+    # shellcheck disable=SC2155
+    local redis_ip="$(xmllint --xpath "string(//config/redis_ip)" "${CONFIG_FILE}")"
+    [[ "${redis_ip}X" == "IPX" ]] && log_error "please configure ${CONFIG_FILE} redis_ip first!" && exit 1
+    # shellcheck disable=SC2155
+    local redis_port="$(xmllint --xpath "string(//config/redis_port)" "${CONFIG_FILE}")"
+
+    # shellcheck disable=SC2155
+    local etcd_ip="$(xmllint --xpath "string(//config/etcd_ip)" "${CONFIG_FILE}")"
+    [[ "${etcd_ip}X" == "IPX" ]] && log_error "please configure ${CONFIG_FILE} etcd_ip first!" && exit 1
+    # shellcheck disable=SC2155
+    local etcd_port="$(xmllint --xpath "string(//config/etcd_port)" "${CONFIG_FILE}")"
+
+    # shellcheck disable=SC2155
+    local master_ip="$(xmllint --xpath "string(//config/master_ip)" "${CONFIG_FILE}")"
+    [[ "${master_ip}X" == "IPX" ]] && log_error "please configure ${CONFIG_FILE} master_ip first!" && exit 1
+    # shellcheck disable=SC2155
+    local ds_master_port="$(xmllint --xpath "string(//config/ds_master_port)" "${CONFIG_FILE}")"
+
+    # shellcheck disable=SC2155
+    local local_ip="$(xmllint --xpath "string(//config/local_ip)" "${CONFIG_FILE}")"
+    [[ "${local_ip}X" == "IPX" ]] && log_error "please configure ${CONFIG_FILE} local_ip first!" && exit 1
+    # shellcheck disable=SC2155
+    # shellcheck disable=SC2155
+    local workermgr_listen_port="$(xmllint --xpath "string(//config/workermgr_listen_port)" "${CONFIG_FILE}")"
+
+    # shellcheck disable=SC2155
+    local log_level="$(xmllint --xpath "string(//config/log_level)" "${CONFIG_FILE}")"
+
+    # shellcheck disable=SC2155
+    GLOBAL_SCHEDULER_PORT="$(xmllint --xpath "string(//config/global_scheduler_port)" "${CONFIG_FILE}")"
+    PROXY_TCP_PORT=$(xmllint --xpath "string(//config/proxy_tcp_port)" "${CONFIG_FILE}")
+    PROXY_HTTP_PORT=$(xmllint --xpath "string(//config/proxy_http_port)" "${CONFIG_FILE}")
+    PROXY_GRPC_PORT=$(xmllint --xpath "string(//config/proxy_grpc_port)" "${CONFIG_FILE}")
+    RUNTIME_MGR_PORT=$(xmllint --xpath "string(//config/runtime_mgr_port)" "${CONFIG_FILE}")
+    RUNTIME_INIT_PORT=$(xmllint --xpath "string(//config/runtime_init_port)" "${CONFIG_FILE}")
+    WORKER_HTTP_PORT=$(xmllint --xpath "string(//config/worker_http_port)" "${CONFIG_FILE}")
+    WORKER_TCP_PORT=$(xmllint --xpath "string(//config/worker_tcp_port)" "${CONFIG_FILE}")
+    WORKER_AGENT_PORT=$(xmllint --xpath "string(//config/worker_agent_port)" "${CONFIG_FILE}")
+    FRONTEND_HTTP_PORT=$(xmllint --xpath "string(//config/frontend_http_port)" "${CONFIG_FILE}")
+    FRONTEND_HTTP2_PORT=$(xmllint --xpath "string(//config/frontend_http2_port)" "${CONFIG_FILE}")
+    FRONTEND_GRPC_PORT=$(xmllint --xpath "string(//config/frontend_grpc_port)" "${CONFIG_FILE}")
+    DS_WORKER_PORT=$(xmllint --xpath "string(//config/ds_worker_port)" "${CONFIG_FILE}")
+    DS_AGENT_PORT=$(xmllint --xpath "string(//config/ds_agent_port)" "${CONFIG_FILE}")
+
+    export REDIS_ADDR="${redis_ip}:${redis_port}"
+    export ETCD_ADDR="${etcd_ip}:${etcd_port}"
+    export WORKERMGR_IP=${master_ip}
+    export WORKERMGR_SVC_PORT=${workermgr_listen_port}
+    export DS_MASTER_ADDRESS="${master_ip}:${ds_master_port}"
+    export LOG_LEVEL=${log_level}
+    export LOCAL_IP=${local_ip}
+}
+
+function exit_with_msg() {
+    local err_msg="$1"
+    local ret="$2"
+    echo -e "${err_msg}" >&2
+    if [ -n "${ret}" ]; then
+        exit "${ret}"
+    else
+        exit 1
+    fi
+}
+
+function check_input() {
+    if [ ${CPU4COMP} -le 0 ]; then
+        printf "**ERROR** cpu for function instances deployment is less then 0\n"
+        usage
+        return 1
+    fi
+
+    if [ ${MEM4COMP} -le 0 ]; then
+        printf "**ERROR** memory for function instances deployment is less then 0\n"
+        usage
+        return 1
+    fi
+
+    if [ -z "${INSTALL_DIR}" ]; then
+        printf "**ERROR** installation directory is not specified\n"
+        usage
+        return 1
+    fi
+
+    if [ ! -d "${INSTALL_DIR}" ]; then
+        printf "**WARN** provided installation directory is not a directory and then create\n"
+        mkdir -p "${INSTALL_DIR}"
+    fi
+
+    return 0
+}
+
+function print_info() {
+    printf "mp kernel Deployment Info:\n"
+    printf "%25s %10s\n" "LOG_LEVEL:" "${LOG_LEVEL}"
+    printf "\n"
+    printf "%25s %10s\n" "HOST_IP:" "${HOST_IP}"
+    printf "\n"
+
+    printf "%25s %10s\n" "PROXY_TCP_PORT:" "${PROXY_TCP_PORT}"
+    printf "%25s %10s\n" "PROXY_HTTP_PORT:" "${PROXY_HTTP_PORT}"
+    printf "%25s %10s\n" "PROXY_GRPC_PORT:" "${PROXY_GRPC_PORT}"
+
+    printf "%25s %10s\n" "WORKER_HTTP_PORT:" "${WORKER_HTTP_PORT}"
+    printf "%25s %10s\n" "WORKER_TCP_PORT:" "${WORKER_TCP_PORT}"
+    printf "%25s %10s\n" "WORKER_AGENT_PORT:" "${WORKER_AGENT_PORT}"
+    printf "%25s %10s\n" "REALTIME_LOGS:" "${REALTIME_LOGS}"
+    printf "%25s %10s\n" "ENABLE_SCHEDULER:" "${ENABLE_SCHEDULER}"
+
+    printf "%25s %10s\n" "RUNTIME_MGR_PORT:" "${RUNTIME_MGR_PORT}"
+    printf "%25s %10s\n" "RUNTIME_INIT_PORT:" "${RUNTIME_INIT_PORT}"
+    printf "\n"
+
+    printf "%25s %10s\n" "OVERALL CPU:" "${CPUALL}"
+    printf "%25s %10s\n" "OVERALL MEM:" "${MEMALL}"
+    printf "%25s %10s\n" "CPU FOR FUNCTIONS:" "${CPU4COMP}"
+    printf "%25s %10s\n" "MEM FOR FUNCTIONS:" "${MEM4COMP}"
+    printf "%25s %10s\n" "SHARED MEM FOR DS:" "${MEM4DATA}"
+    printf "\n"
+
+    if [ "X${ENABLE_FRONTEND}" == "XON" ]; then
+        printf "%25s %10s\n" "FRONTEND_HTTP_PORT:" "${FRONTEND_HTTP_PORT}"
+        printf "%25s %10s\n" "FRONTEND_HTTP2_PORT:" "${FRONTEND_HTTP2_PORT}"
+        printf "%25s %10s\n" "FRONTEND_GRPC_PORT:" "${FRONTEND_GRPC_PORT}"
+    fi
+    printf "%25s %10s\n" "DS_WORKER_PORT:" "${DS_WORKER_PORT}"
+    if [ "X${ENABLE_DS_AGENT}" == "XON" ]; then
+        printf "%25s %10s\n" "DS_AGENT_PORT:" "${DS_AGENT_PORT}"
+    fi
+    printf "%25s %10s\n" "DS_MASTER_ADDRESS:" "${DS_MASTER_ADDRESS}"
+
+    printf "\n\n"
+}
+
+function start_admin_service() {
+    # load config
+    init_config_var ${CONFIG_FILE}
+    [[ "${LOCAL_IP}X" == "IPX" || "${LOCAL_IP}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} local_ip first!" && exit 1
+    [[ "${REPO_PORT}X" == "X" ]] && log_error "please config ${CONFIG_FILE} function_repo_port first!" && exit 1
+    [[ "${ADMIN_PORT}X" == "X" ]] && log_error "please config ${CONFIG_FILE} admin_port first!" && exit 1
+    [[ "${LOG_LEVEL}X" == "X" ]] && log_error "please configure ${LOG_LEVEL} DEPLOY_PATH first!" && exit 1
+    [[ "${WORKERMGR_LISTEN_PORT}X" == "X" ]] && log_error "please config ${CONFIG_FILE} workermgr port first!" && exit 1
+    DEPLOY_PATH="${INSTALL_DIR}"/functioncore/admin
+
+    CONFIG_INSTALL_DIR="${DEPLOY_PATH}"/config
+    sed -i "s#{logConfigPath}#${LOG_DIR}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{logLevel}#${LOG_LEVEL}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{install_dir}#${INSTALL_DIR}#g" "${CONFIG_INSTALL_DIR}"/*
+    sed -i "s#{local_ip}#${LOCAL_IP}#g" "${CONFIG_INSTALL_DIR}"/*
+    sed -i "s#{repo_port}#${REPO_PORT}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{admin_port}#${ADMIN_PORT}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{workermgr_listen_port}#${WORKERMGR_LISTEN_PORT}#g" "${CONFIG_INSTALL_DIR}"/config.json
+
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${DEPLOY_PATH}/bin"
+    ResourcePath="${DEPLOY_PATH}"/resource/ "${DEPLOY_PATH}"/bin/distribute-executor --module admin-service \
+        --log_config_path="${CONFIG_INSTALL_DIR}"/log.json \
+        --config_path="${CONFIG_INSTALL_DIR}"/config.json \
+        >"${LOG_DIR}"/admin.log 2>&1 &
+
+    ADMIN_SERVICE_PID=$(echo $!)
+    return 0
+}
+
+function start_function_repo() {
+    # load config
+    init_config_var ${CONFIG_FILE}
+    [[ "${LOCAL_IP}X" == "IPX" || "${LOCAL_IP}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} local_ip first!" && exit 1
+    [[ "${ETCD_PORT}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} etcd_port first!" && exit 1
+    [[ "${ETCD_IP}X" == "IPX" || "${ETCD_IP}X" == "X" ]] && log_error "please configuer ${CONFIG_FILE} etcd_ip first!" && exit 1
+    [[ "${REPO_PORT}X" == "X" ]] && log_error "please config ${CONFIG_FILE} function_repo_port first!" && exit 1
+    [[ "${LOG_LEVEL}X" == "X" ]] && log_error "please configure ${LOG_LEVEL} DEPLOY_PATH first!" && exit 1
+    DEPLOY_PATH="${INSTALL_DIR}"/functioncore/function-repo
+
+    CONFIG_INSTALL_DIR="${DEPLOY_PATH}"/config
+    sed -i "s#{logConfigPath}#${LOG_DIR}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{logLevel}#${LOG_LEVEL}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{etcd_port}#${ETCD_PORT}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{username}#root#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{etcd_password}#${ETCD_PASSWORD}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{etcd_ip}#${ETCD_IP}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{install_dir}/upload#/tmp/upload#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{local_ip}#${LOCAL_IP}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    [ -n "$MINIO_ADDR" ] && sed -i "s#{minio_ip}:{minio_port}#${MINIO_ADDR}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    [ -z "$MINIO_ADDR" ] && sed -i "s#{minio_ip}:{minio_port}#127.0.0.1:19001#g" "${CONFIG_INSTALL_DIR}"/config.json
+    sed -i "s#{repo_port}#${REPO_PORT}#g" "${CONFIG_INSTALL_DIR}"/config.json
+    [ -z "$MINIO_ADDR" ] && sed -i 's#"storageType": "s3"#"storageType": "local"#' "${CONFIG_INSTALL_DIR}"/config.json
+
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${DEPLOY_PATH}/bin"
+    ResourcePath="${DEPLOY_PATH}"/resource/ POD_IP=${LOCAL_IP} "${DEPLOY_PATH}"/bin/distribute-executor --module function-repo \
+        --log_config_path="${CONFIG_INSTALL_DIR}"/log.json \
+        --config_path="${CONFIG_INSTALL_DIR}"/config.json \
+        >"${LOG_DIR}"/function-repo.log 2>&1 &
+
+    FUNCTION_REPO_PID=$(echo $!)
+    return 0
+}
+
+function start_worker_manager() {
+
+    # load config
+    init_config_var ${CONFIG_FILE}
+
+    [[ "${LOG_LEVEL}X" == "X" ]] && log_error "please configure ${LOG_LEVEL} DEPLOY_PATH first!" && exit 1
+    [[ "${LOCAL_IP}X" == "IPX" || "${LOCAL_IP}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} LOCAL_IP first!" && exit 1
+    [[ "${ETCD_PORT}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} etcd_port first!" && exit 1
+    [[ "${ETCD_IP}X" == "IPX" || "${ETCD_IP}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} etcd_ip first!" && exit 1
+    [[ "${WORKERMGR_LISTEN_PORT}X" == "X" || "${WORKERMGR_LISTEN_PORT}X" == "X" ]] && WORKERMGR_LISTEN_PORT="12111"
+    [[ "${CODE_DIR}X" == "X" ]] && CODE_DIR="/dcache"
+    [[ "${GLOBAL_SCHEDULER_PORT}X" == "X" ]] && log_error "please configure ${CONFIG_FILE} etcd_ip first!" && exit 1
+    local DEPLOY_PATH="${INSTALL_DIR}"/functioncore/worker-manager
+
+    CONFIG_INSTALL_DIR="${DEPLOY_PATH}"/config
+    sed -i "s#{logConfigPath}#${LOG_DIR}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{logLevel}#${LOG_LEVEL}#g" "${CONFIG_INSTALL_DIR}"/log.json
+    sed -i "s#{deploy_dir}#${CODE_DIR}#g" ${CONFIG_INSTALL_DIR}/worker-manager.conf
+    sed -i "s#{etcd_port}#${ETCD_PORT}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{username}#root#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{etcd_password}#${ETCD_PASSWORD}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{etcd_ip}#${ETCD_IP}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{local_ip}#${LOCAL_IP}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{install_dir}#${INSTALL_DIR}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "s#{global_scheduler_port}#${GLOBAL_SCHEDULER_PORT}#g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+    sed -i "/httpEnable/s/false/true/g" "${CONFIG_INSTALL_DIR}"/worker-manager.conf
+
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${DEPLOY_PATH}/bin"
+    ResourcePath="${DEPLOY_PATH}"/resource/ POD_IP=${LOCAL_IP} FUNCTION_ACTIVE_PORT=${WORKERMGR_LISTEN_PORT} "${DEPLOY_PATH}"/bin/distribute-executor --module worker-manager \
+        --log_config_path="${CONFIG_INSTALL_DIR}"/log.json \
+        --config_path="${CONFIG_INSTALL_DIR}"/worker-manager.conf \
+        >"${LOG_DIR}"/worker-manager.log 2>&1 &
+
+    WORKER_MANAGER_PID=$(echo $!)
+    return 0
+}
+
+function start_frontend() {
+    local FRONTEND_INSTALL_DIR="${INSTALL_DIR}/functioncore/frontend"
+    local FRONTEND_CONFIG_INSTALL_DIR="${INSTALL_DIR}/functioncore/frontend/config"
+
+    sed -i "s|{{logLevel}}|$LOG_LEVEL|g" "${FRONTEND_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{logConfigPath}}|$LOG_DIR|g" "${FRONTEND_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{ETCD_USER}}|root|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{ETCD_PASSWORD}}|$ETCD_PASSWORD|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{ETCD_ADDR}}|$ETCD_ADDR|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{INSTALL_DIR}}|$FRONTEND_INSTALL_DIR|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{FRONTEND_HTTP_PORT}}|$FRONTEND_HTTP_PORT|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{FRONTEND_HTTP2_PORT}}|$FRONTEND_HTTP2_PORT|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{FRONTEND_GRPC_PORT}}|$FRONTEND_GRPC_PORT|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{WORKERMGR_IP}}|$WORKERMGR_IP|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{WORKERMGR_SVC_PORT}}|$WORKERMGR_SVC_PORT|g" "${FRONTEND_CONFIG_INSTALL_DIR}/config.json"
+    bash ${INSTALL_DIR}/functioncore/frontend/bin/init-frontend.sh
+
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${INSTALL_DIR}/functioncore/frontend/bin"
+    local bin="${INSTALL_DIR}/functioncore/frontend/bin/distribute-executor --module frontend"
+
+    POD_IP=${HOST_IP} ResourcePath=${FRONTEND_INSTALL_DIR}/resource HOST_IP=${HOST_IP} \
+        NODE_ID=${NODE_ID} ${bin} \
+        --log_config_path="${FRONTEND_CONFIG_INSTALL_DIR}"/log.json \
+        --config_path="${FRONTEND_CONFIG_INSTALL_DIR}"/config.json \
+        >"${LOG_DIR}"/frontend.log 2>&1 &
+
+    FRONTEND_PID=$(echo $!)
+    return 0
+}
+
+function start_bus_proxy() {
+    local FNTASK_CONFIG_INSTALL_DIR="${INSTALL_DIR}/functioncore/functiontask/config"
+    sed -i "s|{{ETCD_USER}}|root|g" "${FNTASK_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{ETCD_PASSWORD}}|$ETCD_PASSWORD|g" "${FNTASK_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{ETCD_ADDR}}|$ETCD_ADDR|g" "${FNTASK_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{WORKERMGR_IP}}|$WORKERMGR_IP|g" "${FNTASK_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{WORKERMGR_SVC_PORT}}|$WORKERMGR_SVC_PORT|g" "${FNTASK_CONFIG_INSTALL_DIR}/config.json"
+    sed -i "s|{{REDIS_ADDR}}|$REDIS_ADDR|g" "${FNTASK_CONFIG_INSTALL_DIR}/conf.json"
+    sed -i "s|{{S3_ADDR}}|$MINIO_ADDR|g" "${FNTASK_CONFIG_INSTALL_DIR}/conf.json"
+    sed -i "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" "${FNTASK_CONFIG_INSTALL_DIR}/conf.json"
+    sed -i "s|{{STATE_STORAGE_TYPE}}|redis|g" "${FNTASK_CONFIG_INSTALL_DIR}/conf.json"
+    sed -i "s|{{logConfigPath}}|$LOG_DIR|g" "${FNTASK_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{logLevel}}|$LOG_LEVEL|g" "${FNTASK_CONFIG_INSTALL_DIR}/log.json"
+    mkdir -p ${INSTALL_DIR}/functioncore/dcache
+
+    local DEPLOY_PATH="${INSTALL_DIR}"/functioncore/functiontask/
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${DEPLOY_PATH}/bin"
+    local bin="${INSTALL_DIR}/functioncore/functiontask/bin/distribute-executor --module functiontask"
+
+    HOST_IP=${HOST_IP} POD_IP=${HOST_IP} NODE_ID=${NODE_ID} HOSTNAME=${NODE_ID} ResourcePath=${DEPLOY_PATH}/resource \
+        FUNCTION_TASK_CONFIG_PATH=${INSTALL_DIR}/functioncore/functiontask/config/conf.json \
+        LD_LIBRARY_PATH=${INSTALL_DIR}/functioncore/functiontask/datasystem/lib:${LD_LIBRARY_PATH} \
+        DEPLOY_DIR=${INSTALL_DIR}/functioncore \
+        ${bin} --ds_port="${DS_WORKER_PORT}" --tcp_port="${PROXY_TCP_PORT}" --http_port="${PROXY_HTTP_PORT}" \
+        --log_config_path="${FNTASK_CONFIG_INSTALL_DIR}"/log.json --config_path="${FNTASK_CONFIG_INSTALL_DIR}"/config.json \
+        --storage_config_path="${FNTASK_CONFIG_INSTALL_DIR}"/conf.json \
+        --grpc_port="${PROXY_GRPC_PORT}" \
+        --global_scheduler_port="${GLOBAL_SCHEDULER_PORT}" --enable_scheduler=${ENABLE_SCHEDULER} \
+        --health_enable=true --metrics_enable=false >"${LOG_DIR}"/busproxy.log 2>&1 &
+
+    PROXY_PID=$(echo $!)
+    return 0
+}
+
+function start_runtime_mgr() {
+    local RUNTIMEMGR_CONFIG_INSTALL_DIR="${INSTALL_DIR}/functioncore/runtime-manager/config"
+    sed -i "s|{{logConfigPath}}|$LOG_DIR|g" "${RUNTIMEMGR_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{logLevel}}|$LOG_LEVEL|g" "${RUNTIMEMGR_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{initPort}}|$RUNTIME_INIT_PORT|g" "${RUNTIMEMGR_CONFIG_INSTALL_DIR}/runtime-manager-config.json"
+    sed -i "s|{{serverPort}}|$RUNTIME_MGR_PORT|g" "${RUNTIMEMGR_CONFIG_INSTALL_DIR}/runtime-manager-config.json"
+    sed -i 's|"useNewRuntimePath": false|"useNewRuntimePath": true|g' "${RUNTIMEMGR_CONFIG_INSTALL_DIR}/runtime-manager-config.json"
+    sed -i "s|/home/snuser/log|$LOG_DIR/runtime/log|g" "${INSTALL_DIR}/runtime/python/config/python-runtime-log.json"
+    sed -i "s|DEBUG|$LOG_LEVEL|g" "${INSTALL_DIR}/runtime/python/config/python-runtime-log.json"
+    local RUNTIME_MGR_DIR=${INSTALL_DIR}/functioncore/runtime-manager
+
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${RUNTIME_MGR_DIR}/bin"
+    local bin="${RUNTIME_MGR_DIR}/bin/distribute-executor --module runtime-manager"
+
+    HOST_IP=${HOST_IP} POD_IP=${HOST_IP} RUNTIME_PATH=${INSTALL_DIR}/runtime \
+        LD_LIBRARY_PATH="${INSTALL_DIR}/sdk/cpp/lib:${LD_LIBRARY_PATH}" ${bin} \
+        --proc_metrics_cpu=${CPU4COMP} --proc_metrics_memory=${MEM4COMP} \
+        --log_config_path="${RUNTIMEMGR_CONFIG_INSTALL_DIR}"/log.json \
+        --runtime_mgr_config_path="${RUNTIMEMGR_CONFIG_INSTALL_DIR}"/runtime-manager-config.json \
+        --runtime_dir="${INSTALL_DIR}/runtime" --setCmdCred=false --pythonDependencyPath="" \
+        --runtime_config_dir="${RUNTIMEMGR_CONFIG_INSTALL_DIR}/" \
+        --runtime_logs_dir="${LOG_DIR}/runtime" >"${LOG_DIR}"/runtime-manager.log 2>&1 &
+    RUNTIME_MGR_PID=$(echo $!)
+    return 0
+}
+
+function start_worker() {
+    local WORKER_CONFIG_INSTALL_DIR="${INSTALL_DIR}/functioncore/worker/config"
+    sed -i "s|{{ETCD_USER}}|root|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{ETCD_PASSWORD}}|$ETCD_PASSWORD|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{ETCD_ADDR}}|$ETCD_ADDR|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{REDIS_ADDR}}|$REDIS_ADDR|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{S3_ADDR}}|$MINIO_ADDR|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{WORKER_HTTP_PORT}}|$WORKER_HTTP_PORT|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{WORKER_TCP_PORT}}|$WORKER_TCP_PORT|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+    sed -i "s|{{logConfigPath}}|$LOG_DIR|g" "${WORKER_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{logLevel}}|$LOG_LEVEL|g" "${WORKER_CONFIG_INSTALL_DIR}/log.json"
+    sed -i "s|{{FUNCTION_STORAGE_TYPE}}|s3|g" "${WORKER_CONFIG_INSTALL_DIR}/config.yaml"
+
+    local DEPLOY_PATH="${INSTALL_DIR}"/functioncore/worker
+    cp -rf "${INSTALL_DIR}/bin/distribute-executor" "${DEPLOY_PATH}/bin"
+    local bin="${DEPLOY_PATH}/bin/distribute-executor --module worker"
+
+    HOST_IP=${HOST_IP} POD_IP=${HOST_IP} NODE_ID=${NODE_ID} ResourcePath=${DEPLOY_PATH}/resource MULTI_RUNTIME_MODE=true \
+        RUNTIME_TYPE=cpp NODE_ID=${NODE_ID} STORAGE_LIMIT="35103210" \
+        ${bin} --config="${WORKER_CONFIG_INSTALL_DIR}"/config.yaml \
+        --log_config_path="${WORKER_CONFIG_INSTALL_DIR}"/log.json \
+        --rm_port=${RUNTIME_MGR_PORT} --tcp_port=${WORKER_TCP_PORT} \
+        --local_scheduler_port="${PROXY_GRPC_PORT}" \
+        --cpu=${CPU4COMP} --mem=${MEM4COMP} --worker_agent_port=${WORKER_AGENT_PORT} \
+        --ds_port="${DS_WORKER_PORT}" --print_metrics=${REALTIME_LOGS} --busGrpcPort=${PROXY_GRPC_PORT} >"${LOG_DIR}"/worker.log 2>&1 &
+
+    WORKER_PID=$(echo $!)
+    return 0
+}
+
+function start_dsmaster() {
+    DATASYSTEM_INSTALL_DIR="${INSTALL_DIR}"/datasystem
+
+    # install datasystem and start master
+    mkdir -p "${DATASYSTEM_INSTALL_DIR}"/rocksdb
+    [ ! -d "${SOCKET_DIR}" ] && mkdir -p "${SOCKET_DIR}"
+    LD_LIBRARY_PATH="${DATASYSTEM_INSTALL_DIR}/service/lib:${LD_LIBRARY_PATH}" ${DATASYSTEM_INSTALL_DIR}/service/master -master_address="${DS_MASTER_ADDRESS}" \
+        -backend_store_dir="${DATASYSTEM_INSTALL_DIR}"/rocksdb \
+        -log_dir="${LOG_DIR}"/ \
+        -unix_domain_socket_dir="${SOCKET_DIR}" \
+        -v=1 >"${LOG_DIR}"/datasystem-master.log 2>&1 &
+    DS_MASTER_PID=$(echo $!)
+    return 0
+}
+
+function start_ds_worker() {
+    local DS_DIR="${INSTALL_DIR}/datasystem"
+    local bin=${DS_DIR}/service/worker
+    [ ! -d "${LOG_DIR}" ] && mkdir -p "${LOG_DIR}"
+    [ ! -d "${SOCKET_DIR}" ] && mkdir -p "${SOCKET_DIR}"
+
+    LD_LIBRARY_PATH=${DS_DIR}/service/lib:${LD_LIBRARY_PATH} ${bin} \
+        -master_address="${DS_MASTER_ADDRESS}" \
+        -log_dir="${LOG_DIR}" \
+        -shared_memory_size_mb=${MEM4DATA} \
+        -worker_address="${HOST_IP}:${DS_WORKER_PORT}" \
+        -unix_domain_socket_dir="${SOCKET_DIR}" \
+        -v=1 \
+        -sc_regular_socket_num=2 \
+        -sc_stream_socket_num=2 \
+        -spill_directory="${SPILL_PATH}" \
+        -spill_size_limit="${SPILL_SIZE_LIMIT}" \
+        -max_client_num="${MAX_CLIENT_NUM}" >"${LOG_DIR}"/datasystem-worker.log 2>&1 &
+    DS_WORKER_PID=$(echo $!)
+    return 0
+}
+
+function start_ds_agent() {
+    local DS_DIR="${INSTALL_DIR}/datasystem"
+    local bin=${DS_DIR}/service/agent
+    [ ! -d "${SOCKET_DIR}" ] && mkdir -p "${SOCKET_DIR}"
+
+    LD_LIBRARY_PATH=${DS_DIR}/service/lib:${LD_LIBRARY_PATH} ${bin} \
+        -log_dir="${LOG_DIR}" \
+        -worker_address="${HOST_IP}:${DS_WORKER_PORT}" \
+        -agent_address="${HOST_IP}:${DS_AGENT_PORT}" \
+        -unix_domain_socket_dir="${SOCKET_DIR}" >"${LOG_DIR}"/datasystem-agent.log 2>&1 &
+    DS_AGENT_PID=$(echo $!)
+    return 0
+}
+
+function admin_health_check() {
+    echo -e "health check: admin"
+    local admin_url="http://${HOST_IP}:${ADMIN_PORT}/healthz"
+    admin_status=`python -c 'import health_check; print(health_check.check("'${admin_url}'"))'`
+    if [ "${admin_status}" = "False" ]; then
+      echo "admin health check failed"
+      echo "please check admin port: ${ADMIN_PORT}"
+      exit 1
+    fi
+}
+
+function repo_health_check() {
+    echo -e "health check: repo"
+    local repo_url="http://${HOST_IP}:${REPO_PORT}/healthz"
+    repo_status=`python -c 'import health_check; print(health_check.check("'${repo_url}'"))'`
+    if [ "${repo_status}" = "False" ]; then
+      echo "repo health check failed"
+      echo "please check repo port: ${REPO_PORT}"
+      exit 1
+    fi
+}
+
+function frontend_health_check() {
+    echo -e "health check: fronend"
+    local frontend_url="http://${HOST_IP}:${FRONTEND_HTTP_PORT}/healthz"
+    frontend_status=`python -c 'import health_check; print(health_check.check("'${frontend_url}'"))'`
+    if [ "${frontend_status}" = "False" ]; then
+      echo "frontend health check failed"
+      echo "please check frontend port: ${FRONTEND_HTTP_PORT}"
+      exit 1
+    fi
+}
+
+function worker_manager_health_check() {
+    echo -e "health check: worker-manager"
+    local worker_manager_url="http://${HOST_IP}:${WORKERMGR_LISTEN_PORT}/healthz"
+    worker_manager_status=`python -c 'import health_check; print(health_check.check("'${worker_manager_url}'"))'`
+    if [ "${worker_manager_status}" = "False" ]; then
+      echo "worker-manager health check failed"
+      echo "please check worker-manager port: ${WORKERMGR_LISTEN_PORT}"
+      exit 1
+    fi
+}
+
+function functiontask_health_check() {
+    echo -e "health check: functiontask"
+    local functiontask_url="http://${HOST_IP}:8888/healthz"
+    functiontask_status=`python -c 'import health_check; print(health_check.check("'${functiontask_url}'"))'`
+    if [ "${functiontask_status}" = "False" ]; then
+      echo "functiontask health check failed"
+      echo "please check functiontask port: 8888"
+      exit 1
+    fi
+}
+
+function runtime_manager_health_check() {
+    echo -e "health check: runtime-manager"
+    runtime_mgr_listen_num=`lsof -i:${RUNTIME_MGR_PORT} | wc -l`
+    if [ "$runtime_mgr_listen_num" -le "0" ];then
+      echo "runtime-manager health check failed"
+      echo "please check runtime-manager port: ${RUNTIME_MGR_PORT}"
+      exit 1
+    fi
+}
+
+function usage() {
+    echo -e "Usage: ./start_mp [-c cpu_cores_all] [-m memory_all_mb] [-s ds_shared_memory_mb] [-a ] [-h help]"
+    echo -e "Options:"
+    echo -e "     -c overall cpu cores (1/1000 core) in current script context"
+    echo -e "     -m overall memory (MB) in current script context"
+    echo -e "     -s data system shared memory (MB) should be reserved in current script context"
+    echo -e "     -a install master module"
+    echo -e "     -p etcd password"
+    echo -e "     -h usage help"
+    echo -e "      "
+    echo -e "example:"
+    echo -e "   ./start_mp -c 10000 -m 40960 -s 2048 -a"
+    echo -e ""
+}
+
+function check_opt() {
+    while getopts "c:m:s:p:l:v:q:ah" opt; do
+        case "$opt" in
+        c)
+            CPUALL=$OPTARG
+            CPU4COMP=$((${CPUALL} + ${CPU4COMP}))
+            ;;
+        m)
+            MEMALL=$OPTARG
+            MEM4COMP=$((${MEMALL}))
+            ;;
+        s)
+            MEM4DATA=$OPTARG
+            MEM4COMP=$((${MEM4COMP} - ${MEM4DATA}))
+            ;;
+        p)
+            ETCD_PASSWORD=$OPTARG
+            REDIS_PASSWORD=$OPTARG
+            ;;
+        l)
+            HOST_IP=$OPTARG
+            ;;
+        a)
+            ENABLE_HEAD=ON
+            ;;
+        v)
+            SPILL_PATH=$OPTARG
+            ;;
+        q)
+            SPILL_SIZE_LIMIT=$OPTARG
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        *)
+            log_error "Unknown parameter"
+            echo -e ""
+            usage
+            exit 1
+            ;;
+        esac
+    done
+}
+
+function main() {
+
+    check_opt "$@"
+    check_input
+    # load config
+    restore_config
+    init_config_var ${CONFIG_FILE}
+    init_config
+    print_info
+    start=$(date +%s)
+    time=$(echo "$start" "$(date +%s)" | awk '{print $2-$1}')
+    [ ! -d "${LOG_DIR}" ] && mkdir -p "${LOG_DIR}"
+    if [ "X${ENABLE_HEAD}" == "XON" ]; then
+        start_admin_service
+        start_function_repo
+        start_worker_manager
+        start_frontend
+        start_dsmaster
+        start_ds_agent
+    fi
+
+    start_bus_proxy
+    start_runtime_mgr
+    start_worker
+    start_ds_worker
+
+    # simple health check loop
+    PROCESS_LIST="${PROXY_PID} ${WORKER_PID} ${RUNTIME_MGR_PID} ${DS_WORKER_PID}"
+    if [ "X${ENABLE_HEAD}" == "XON" ]; then
+        PROCESS_LIST="${PROCESS_LIST} ${DS_MASTER_PID} ${DS_AGENT_PID} ${FRONTEND_PID} ${WORKER_MANAGER_PID} ${ADMIN_SERVICE_PID} ${FUNCTION_REPO_PID}"
+    fi
+
+    cd "${BASE_DIR}"
+    if [ "X${ENABLE_HEAD}" == "XON" ]; then
+        admin_health_check
+        repo_health_check
+        frontend_health_check
+        worker_manager_health_check
+    fi
+    functiontask_health_check
+    runtime_manager_health_check
+}
+
+export PATH=${PATH}:${INSTALL_DIR}/bin
+export ResourcePath="${INSTALL_DIR}"/resource
+
+main "$@"

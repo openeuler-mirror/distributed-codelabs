@@ -1,0 +1,38 @@
+{
+  "LokiPath": "",
+  "ServerPort": {{serverPort}},
+  "useNewRuntimePath": false,
+  "portNum": 10000,
+  "retryTimes": 2,
+  "recycleLog": 604800,
+  "metricsCollectorType": "proc",
+  "runtimeConfigs": {
+    "initial": {
+      "port": {{initPort}}
+    },
+    "java8": {
+      "port": 31537,
+      "enable": false
+    },
+    "python3.8": {
+      "port": 31539,
+      "enable": false
+    },
+    "nodejs10.15.2": {
+      "port": 31540,
+      "enable": false
+    },
+    "cpp11": {
+      "port": 31541,
+      "enable": false
+    },
+    "custom-runtime": {
+      "port": 31538,
+      "enable": false
+    },
+    "posix-custom-runtime": {
+      "port": 31542,
+      "enable": false
+    }
+  }
+}

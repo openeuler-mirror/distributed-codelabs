@@ -1,0 +1,118 @@
+{
+  "etcd": {
+    "servers": ["{etcd_ip}:{etcd_port}"],
+    "user": "{username}",
+    "password": "{etcd_password}",
+    "sslEnable": false
+  },
+  "function": {
+    "default": {
+      "version": "$latest",
+      "envPrefix": "func-",
+      "pageIndex": 1,
+      "pageSize": 1000,
+      "cpuList": [
+          500,
+          1500,
+          4000
+      ],
+      "memoryList": [
+          500,
+          3000,
+          16000
+      ],
+      "timeout": 86400,
+      "defaultMinInstance": "0",
+      "defaultMaxInstance": "100",
+      "defaultConcurrentNum": "100",
+      "maxInstanceUpperLimit": "10000",
+      "concurrentNumUpperLimit": "100"
+    },
+    "package": {
+      "uploadTempPath": "{install_dir}/upload",
+      "zipFileSizeMaxMB": 500,
+      "unzipFileSizeMaxMB": 1000,
+      "fileCountsMax": 30000,
+      "dirDepthMax": 20,
+      "ioReadTimeout": 100000
+    },
+    "versionMax": 8,
+    "aliasMax": 8,
+    "layerMax": 5
+  },
+  "bucket": [
+    {
+      "bucketId": "bucket-test-log1",
+      "businessId": "yrk",
+      "appId": "61022",
+      "appSecret": "E8305B6B5802595E198B82985F61014E:85D87E1102D94A246C58F8A0DCC829B99A88DCA6F5DDAA658CEE0C27D60385F984FC2F3035067A038280C7F62BE57AE9",
+      "url": "http://{minio_ip}:{minio_port}",
+      "writable": 1,
+      "description": "11",
+      "createTime": "2019-04-24 18:15:53",
+      "updateTime": "2019-04-24 18:15:53"
+    }
+  ],
+  "runtimeType": [
+      "nodejs10.15.2",
+      "java1.8",
+      "python3.7",
+      "python3.8",
+      "python3.9",
+      "cpp11",
+      "cpp11-bin",
+      "custom-runtime",
+      "go1.13"
+  ],
+  "fileServer": {
+    "storageType": "s3",
+    "s3": {
+      "endpoint": "{minio_ip}:{minio_port}",
+      "accessKey": "d06b003f7d8d60c8ac3d7fa8:5cb9bbf58a0b306a7a8c57b0b933f1b08522c41c",
+      "secretKey": "da701b304eb4a523aa13becc:fb120bfb517a8916b0608165f154d166b9adc07e32f59ad864699af7",
+      "secure": false,
+      "caFile": "/home/sn/module/ca.crt",
+      "presignedUrlExpires": 3600,
+      "timeout": 40,
+      "trustedCA": false
+    }
+  },
+  "trigger": {
+    "urlPrefix": "http://{local_ip}/service/",
+    "type": [
+      {
+        "sourceProvider": "aa",
+        "effect": "bb",
+        "action": "cc"
+      }
+    ]
+  },
+  "compatibleRuntimeType": [
+      "nodejs10.15.2",
+      "java1.8",
+      "python3.7",
+      "python3.8",
+      "cpp11",
+      "cpp11-bin",
+      "custom-runtime",
+      "go1.13"
+  ],
+  "urn": {
+    "prefix": "sn",
+    "zone": "cn",
+    "resourceType": "function"
+  },
+  "env": {
+    "timeZone": "Asia/Shanghai",
+    "nodejsLdPath": "/lib64:/usr/lib64",
+    "nodejsPath": "/home/snuser/runtime/node_modules/:/node_modules:/usr/local/lib/nodejs/node-v10.16.0-linux-x64/lib/node_modules",
+    "javaLdPath": "/lib64:/usr/lib64",
+    "javaPath": "/opt/huawei/jre1.8.0_252/bin",
+    "cppLdPath": "/usr/local/lib",
+    "pythonLdPath": "/lib64:/usr/lib64",
+    "pythonPath": "/usr/lib/python3.7/lib-dynload:/usr/local/lib/python3.7/dist-packages:/usr/local/lib/python3.7/dist-packages/pip-20.1.1-py3.7.egg:/usr/lib/python3/dist-packages"
+  },
+  "server": {
+    "port": {repo_port}
+  }
+}

@@ -1,0 +1,9 @@
+service: helloworld
+kind: yrlib
+description: this is a helloworld service
+functions:
+   helloworld:
+     runtime: python3.9
+     memory: 500
+     cpu: 500
+     timeout: 900
